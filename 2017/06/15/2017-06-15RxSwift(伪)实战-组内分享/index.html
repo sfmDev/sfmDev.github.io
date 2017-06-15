@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS," />
+  <meta name="keywords" content="Swift," />
 
 
 
@@ -84,19 +84,29 @@
 
 
 
-<meta name="description" content="1.先来看看什么是 LLVM?LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年,  Chris Lattner开发了这一套编译器工具库套件.后来随着 LLVM的发展,LLVM可以">
+<meta name="description" content="前提入了 RxSwift 的坑之后的一次组内分享记录,水平菜,纯入门">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LLVM-Clang 学习笔记">
-<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2016/11/18/LLVM-Clang学习笔记/index.html">
+<meta property="og:title" content="RxSwift(伪)实战-组内分享">
+<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/06/15/2017-06-15RxSwift(伪)实战-组内分享/index.html">
 <meta property="og:site_name" content="石不帅_Code">
-<meta property="og:description" content="1.先来看看什么是 LLVM?LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年,  Chris Lattner开发了这一套编译器工具库套件.后来随着 LLVM的发展,LLVM可以">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-c26e5313c3a431d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-e096bed71a77483f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-03-30T01:34:09.000Z">
+<meta property="og:description" content="前提入了 RxSwift 的坑之后的一次组内分享记录,水平菜,纯入门">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-ba126a3c87951ceb.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-f6361fef39f9d2f9.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-b06ad34b48a4c3e5.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-10d74888f7a433f9.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-2daf3794f2de112f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-0922fc656e48316b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-cefe9c08fccd39d3.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-37cc6ca5f42059c7.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-25ffbf19e9097a91.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-991f1cd715188880.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-b5005010f8060c1d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-0e6de9dd0bbca107.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-06-15T14:51:50.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LLVM-Clang 学习笔记">
-<meta name="twitter:description" content="1.先来看看什么是 LLVM?LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年,  Chris Lattner开发了这一套编译器工具库套件.后来随着 LLVM的发展,LLVM可以">
-<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1240939-c26e5313c3a431d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta name="twitter:title" content="RxSwift(伪)实战-组内分享">
+<meta name="twitter:description" content="前提入了 RxSwift 的坑之后的一次组内分享记录,水平菜,纯入门">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1240939-ba126a3c87951ceb.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
 
@@ -124,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2016/11/18/LLVM-Clang学习笔记/"/>
+  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/06/15/2017-06-15RxSwift(伪)实战-组内分享/"/>
 
 
 
 
 
-  <title> LLVM-Clang 学习笔记 | 石不帅_Code </title>
+  <title> RxSwift(伪)实战-组内分享 | 石不帅_Code </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -253,7 +263,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2016/11/18/LLVM-Clang学习笔记/">
+  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/06/15/2017-06-15RxSwift(伪)实战-组内分享/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="石不帅_">
@@ -277,7 +287,7 @@
             
             
               
-                LLVM-Clang 学习笔记
+                RxSwift(伪)实战-组内分享
               
             
           </h1>
@@ -292,8 +302,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-18T13:36:04+08:00">
-                2016-11-18
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-15T22:40:43+08:00">
+                2017-06-15
               </time>
             
 
@@ -302,6 +312,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分享/" itemprop="url" rel="index">
+                    <span itemprop="name">分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -328,25 +360,20 @@
       
 
       
-        <h3 id="1-先来看看什么是-LLVM"><a href="#1-先来看看什么是-LLVM" class="headerlink" title="1.先来看看什么是 LLVM?"></a>1.先来看看什么是 LLVM?</h3><p>LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年,  Chris Lattner开发了这一套编译器工具库套件.后来随着 LLVM的发展,LLVM可以用于常规编译器，JIT编译器，汇编器，调试器，静态分析工具等一系列跟编程语言相关的工作。</p>
-<blockquote>
-<p>Chris Lattner:<br>熟悉 Swift 的开发者肯定知道这位大神的名字,他于2010年开始编写 Swift 语言,而且一个人实现了 Swift 的大部分基础架构.他也是 LVVM 以及 Clang的主要开发者.</p>
+        <blockquote>
+<p>前提<br>入了 RxSwift 的坑之后的一次组内分享记录,水平菜,纯入门</p>
 </blockquote>
-<h3 id="2-GCC-gt-LLVM"><a href="#2-GCC-gt-LLVM" class="headerlink" title="2.GCC -&gt; LLVM"></a>2.GCC -&gt; LLVM</h3><p>GCC是 Xcode早期使用的一个强大的编译器.这个编译器被移植到各种系统中,其中就是 Mac OSX 操作系统,所以这就反映在 Xcode中,在早期的 Xcode 调试代码的一个工具就是 GDB,它是GNU调试器.</p>
-<p>####why换成LLVM呢?<br>Apple（包括中后期的NeXT） 一直使用GCC作为官方的编译器。GCC作为开源世界的编译器标准一直做得不错，但Apple对编译工具会提出更高的要求。<br>一方面，是Apple对Objective-C语言（甚至后来对C语言）新增很多特性，但GCC开发者并不买Apple的帐——不给实现，因此索性后来两者分成两条分支分别开发，这也造成Apple的编译器版本远落后于GCC的官方版本。另一方面，GCC的代码耦合度太高，不好独立，而且越是后期的版本，代码质量越差，但Apple想做的很多功能（比如更好的IDE支持）需要模块化的方式来调用GCC，但GCC一直不给做。甚至最近，《GCC运行环境豁免条款 （英文版）》从根本上限制了LLVM-GCC的开发。 所以，这种不和让Apple一直在寻找一个高效的、模块化的、协议更放松的开源替代品.<a href="http://www.jianshu.com/p/aa27c51c74fb">原文链接</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">版本                 |    编译器版本 </div><div class="line">Xcode3之前    |           GCC        </div><div class="line">Xcode3            |      GCC与 LLVM混合编译器     </div><div class="line">Xcode4            |      LLVM-GCC 成为默认编译器    </div><div class="line">Xcode4.2         |  LLVM3.0成为默认编译器</div><div class="line">Xcode5            | LLVM5.0, 完成 GCC到LLVM的过渡</div></pre></td></tr></table></figure>
-<h3 id="3-LLVM-与-Clang"><a href="#3-LLVM-与-Clang" class="headerlink" title="3.LLVM 与 Clang"></a>3.LLVM 与 Clang</h3><p>Clang是一个C、C++、OC语言的轻量级编译器。源代码发布于BSD协议下。Clang是由C++编写，基于LLVM，发布于LLVM BSD许可证下的编译器。它与GNU C语言规范几乎完全兼容，并增加了额外的特性。<br>如果说 LLVM是 iOS 的编译器是不太准确的,但说clang 是 iOS 的编译器这也不太准确,因为 clang 是编译器前端(下图中的 Frontend).那编译器又什么?<br>简单来说,编译器就是把我们的 C,C++,OC 代码转成 hard code, 在这个过程中,编译器会对代码做各种分析来保证没有无法编译的错误.</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-c26e5313c3a431d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Three-Phase编译器架构"><br>这里就要说一下LLVM的三层架构:</p>
-<p>####1.Frontend:  这第一层就是 clang, 它支持将多种输入语言(c family)经过一系列处理后生成汇编代码(LLVM JR).</p>
-<p>####2.Commer Optimizer:这第二层是一个优化器,对 LLVM JR 做优化.</p>
-<p>####3.Backend:第三层对不同的平台再将汇编转成 machine code.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-e096bed71a77483f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="摘自孙源在 MDCC2016的 session"></p>
-<p>作为一个 iOS 开发者,个人在学习中主要关注在第一层,对第二层第三层只做了解(hello world level).<br>当按下 Xcode上Run这个按钮之后,我们的编译器做了什么呢?</p>
-<p>####1.预处理(Prepreocess): import, macro, 预处理指令…</p>
-<p>####2.词法分析:(Lexical Analysis):将预处理过的代码文本转化成Toke流</p>
-<p>####3.语法分析:(Semantic Analysis):验证语法是否正确,生成语意节点,组合成抽象语法树.(AST)</p>
-<p>####4.静态分析:(static Analysis):类型检查,找出非语法错误.</p>
-<p>####5.代码生成:(CodeGen-IR):生成 LLVM-JR(汇编)</p>
-<p>TO DO:<br>1.clang插件的使用和研究;<br>2.lldb 调试器的深入学习;</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-ba126a3c87951ceb.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.002.jpeg"><br><img src="http://upload-images.jianshu.io/upload_images/1240939-f6361fef39f9d2f9.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.003.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-b06ad34b48a4c3e5.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.004.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-10d74888f7a433f9.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.005.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-2daf3794f2de112f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.006.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-0922fc656e48316b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.007.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-cefe9c08fccd39d3.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.008.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-37cc6ca5f42059c7.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.009.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-25ffbf19e9097a91.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.010.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-991f1cd715188880.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.011.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-b5005010f8060c1d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.012.jpeg"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-0e6de9dd0bbca107.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxSwift keynote.013.jpeg"></p>
 
       
     </div>
@@ -370,7 +397,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS/" rel="tag"># iOS</a>
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
           
         </div>
       
@@ -379,8 +406,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/10/18/Swift3中的 Method Swizzling/" rel="next" title="Swift3中的 Method Swizzling">
-                <i class="fa fa-chevron-left"></i> Swift3中的 Method Swizzling
+              <a href="/2017/06/08/Objective-C 中的消息发送/" rel="next" title="Objective-C 中的消息发送">
+                <i class="fa fa-chevron-left"></i> Objective-C 中的消息发送
               </a>
             
           </div>
@@ -388,10 +415,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/03/2016年年度总结和2017年年度计划/" rel="prev" title="2016年年度总结和2017年年度计划">
-                2016年年度总结和2017年年度计划 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -438,17 +461,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel">
+      <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500"
@@ -504,22 +518,6 @@
 
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-先来看看什么是-LLVM"><span class="nav-number">1.</span> <span class="nav-text">1.先来看看什么是 LLVM?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-GCC-gt-LLVM"><span class="nav-number">2.</span> <span class="nav-text">2.GCC -> LLVM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-LLVM-与-Clang"><span class="nav-number">3.</span> <span class="nav-text">3.LLVM 与 Clang</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
     </div>
