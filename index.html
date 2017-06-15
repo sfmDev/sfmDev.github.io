@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-Hans">
+<html class="theme-next pisces use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -100,7 +100,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Pisces',
     sidebar: {"position":"left","display":"post"},
     fancybox: true,
     motion: true,
@@ -189,6 +189,16 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -321,57 +331,18 @@
       
         
           
-            <blockquote>
-<h3 id="这是一篇复习的笔记-梳理自己的知识点-加深理解"><a href="#这是一篇复习的笔记-梳理自己的知识点-加深理解" class="headerlink" title="这是一篇复习的笔记,梳理自己的知识点,加深理解."></a>这是一篇复习的笔记,梳理自己的知识点,加深理解.</h3></blockquote>
-<p>[TOC]</p>
-<h3 id="Objective-C-中的消息机制"><a href="#Objective-C-中的消息机制" class="headerlink" title="Objective-C 中的消息机制"></a>Objective-C 中的消息机制</h3><p>在OC中,方法的真正实现是在运行时绑定的,这是于 Swift 最大的不同, Swift 是在编译时.编译器会将消息的发送转换为对 objc_msgSend方法的调用.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">OBJC_EXPORT void objc_msgSend(void /* id self, SEL op, ... */ )</div><div class="line">OBJC_EXPORT void objc_msgSendSuper(void /* struct objc_super *super, SEL op, ... */ )</div></pre></td></tr></table></figure></p>
-<p>objc_msgSend 方法有两个必要的参数: receiver和 Selector,并且这个函数可以接受多个参数. objc_msgSend 会根据receiver 和 Sel的类型来调用适当的方法,所以,该方法会在 receiver 的调度表(dispatch table) 中查找 Sel.</p>
-<blockquote>
-<p>编译器构造类时都包含两个必要元素:</p>
-<ol>
-<li>一个指向父类的指针;<br>2.一个调度表,该表将类的 selector 方法与实际内存地址关联起来.</li>
-</ol>
-</blockquote>
-<p>那一个类中有什么? 在 objc.h 中可以看到 Class 其实就是一个 objc_class 结构体指针,它的定义在 runtime.h 中:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">struct objc_class &#123;</div><div class="line">    Class isa;</div><div class="line">#if !__OBJC2__</div><div class="line">    Class super_class                                        </div><div class="line">    const char *name                                    </div><div class="line">    long version                                           </div><div class="line">    long info                                             </div><div class="line">    long instance_size                                       </div><div class="line">    struct objc_ivar_list *ivars                             </div><div class="line">    struct objc_method_list **methodLists                    </div><div class="line">    struct objc_cache *cache                             </div><div class="line">    struct objc_protocol_list *protocols                    </div><div class="line">#endif</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<ul>
-<li>isa是一个Class类型的指针,每个实例对象都有一个指向对象的类的 isa 指针,而 Class 里也有 isa 指针指向 meteClass(元类).而元类也是类,它的 Root class meta的 isa 指针最终指向 Root class,也就是 NSObject, 形成一个封闭的内循环.<br><img src="http://img.ptcms.csdn.net/article/201507/06/5599f1fc7063c.jpg" alt="Class的继承关系图"></li>
-<li>super_class 表示实例对象的父类</li>
-<li>name 表示类名</li>
-<li>ivars其实就是个链表,表示多个成员变量</li>
-<li>methodLists 表示方法列表, Category 的实现原理</li>
-<li>cache用来缓存经常访问的方法</li>
-<li>protocols 表示类遵循的协议</li>
-</ul>
-<p>再回到 objc_msgSend 函数,通过 receiver 对象isa指针获取对应的 class, 优先在cache中查找方法,找不到再去 methodLists 查找,如果在对应的 class 没找到,再通过 super_class 查找;一旦找到 sel就去执行它实现的 imp.<br>可以看到methodLists 中是 Class 的方法列表, Class 中的方法这样定义的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">typedef struct objc_method *Method; </div><div class="line">struct objc_method &#123;</div><div class="line">    SEL method_name                                          </div><div class="line">    char *method_types                                      </div><div class="line">    IMP method_imp                                           </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>那这个 imp 又是什么呢?<br>这个 objc_method 的结构体中存储了方法名(method_name), 方法类型(method_types), 方法实现(method_imp),它是一个函数指针.imp是 Implementation的缩写,指向一个方法实现的指针.</p>
-<h3 id="Objective-C-中的消息发送"><a href="#Objective-C-中的消息发送" class="headerlink" title="Objective-C 中的消息发送"></a>Objective-C 中的消息发送</h3><p>在解释了 objc_msgSend 这个函数之后就逐渐明白,当一个对象调用一个方法的时候,就会被编译器转化为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">id objc_msgSend ( id self, SEL op, ... );</div></pre></td></tr></table></figure></p>
-<p>不过,当编译器转化这个方法时,还会加上两个隐藏参数 self和_cmd.</p>
-<ul>
-<li>self 表示当前这个类对象</li>
-<li>_cmd表示当前调用的方法, 它是 Sel 类型的一个变量.<h3 id="方法解析与转发"><a href="#方法解析与转发" class="headerlink" title="方法解析与转发"></a>方法解析与转发</h3>有一道很经典的面试题就是跟接下来问题相关:<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">什么时候会报unrecognized selector的异常？</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>在调用方法时,如果在接收对象的类继承汇总没有找到Sel,一般情况下,就会 crash 然后抛出unrecognized selector send to …异常,但是在 crash 之前,还有三次机会来挽救这次 crash:<br><img src="http://img.ptcms.csdn.net/article/201507/06/5599f4018fb55_middle.jpg" alt="msgSend"></p>
-<blockquote>
-<p>1.Method resolution</p>
-</blockquote>
-<p>在 OC的运行时会调用+ resolveInstanceMethod(实例方法) 或者+ resolveClassMethod(类方法),当你没有实现某个方法的时候,可以添加这个方法然后会让这个 message 重新发送一次.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">+ (BOOL)resolveInstanceMethod:(SEL)sel &#123;</div><div class="line">    if (sel == @selector(selectorName)) &#123;</div><div class="line">        class_addMethod([self class], sel, imp_implementationWithBlock(^(id self, NSString *word) &#123;</div><div class="line">            NSLog(@&quot;method resolution way : send message = %@&quot;, word);</div><div class="line">        &#125;), &quot;v@*&quot;);</div><div class="line">    &#125;</div><div class="line">    return YES;</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">&gt;2. Fast Forwarding</div><div class="line"></div><div class="line">如果目标对象实现了 forwardingTargetForSelector:, 就会在运行时调用这个方法,让你可以把这个消息转发给其他对象,只要这个方法返回的不是nil和self，整个消息发送的过程就会被重启，当然发送的对象会变成你返回的那个对象。否则，就会继续Normal Fowarding.</div></pre></td></tr></table></figure></p>
-<ul>
-<li><p>(id)forwardingTargetForSelector:(SEL)aSelector<br>{<br>  if (aSelector == @selector(sendMessage:)) {  </p>
-<pre><code>return [MessageForwarding new]; //已经转发给 MessageForwarding这个对象的sendMessage方法
-</code></pre><p>  }<br>  return nil;<br>}  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;3.Normal Forwarding</div><div class="line"></div><div class="line">这一步是Runtime最后一次给你挽救的机会。首先它会发送-methodSignatureForSelector:消息获得函数的参数和返回值类型。如果-methodSignatureForSelector:返回nil，Runtime则会发出-doesNotRecognizeSelector:消息，程序这时也就挂掉了。如果返回了一个函数签名，Runtime就会创建一个NSInvocation对象并发送-forwardInvocation:消息给目标对象。</div></pre></td></tr></table></figure>
-</li>
-<li><p>(NSMethodSignature <em>)methodSignatureForSelector:(SEL)aSelector<br>{<br>  NSMethodSignature </em>methodSignature = [super methodSignatureForSelector:aSelector];<br>  if (!methodSignature) {  </p>
-<pre><code>methodSignature = [NSMethodSignature signatureWithObjCTypes:&quot;v@:*&quot;];  
-</code></pre><p>  }<br>  return methodSignature;<br>}  </p>
-</li>
-<li>(void)forwardInvocation:(NSInvocation <em>)anInvocation<br>{<br>  MessageForwarding </em>messageForwarding = [MessageForwarding new];<br>  if ([messageForwarding respondsToSelector:anInvocation.selector]) {  <pre><code>[anInvocation invokeWithTarget:messageForwarding];  
-</code></pre>  }<br>}<br>```</li>
-</ul>
-<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="http://www.csdn.net/article/2015-07-06/2825133-objective-c-runtime/5" target="_blank" rel="external">http://www.csdn.net/article/2015-07-06/2825133-objective-c-runtime/5</a><br><a href="https://github.com/ChenYilong/iOSInterviewQuestions/blob/master/01%E3%80%8A%E6%8B%9B%E8%81%98%E4%B8%80%E4%B8%AA%E9%9D%A0%E8%B0%B1%E7%9A%84iOS%E3%80%8B%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88/%E3%80%8A%E6%8B%9B%E8%81%98%E4%B8%80%E4%B8%AA%E9%9D%A0%E8%B0%B1%E7%9A%84iOS%E3%80%8B%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E4%B8%8A%EF%BC%89.md#18-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%BC%9A%E6%8A%A5unrecognized-selector%E7%9A%84%E5%BC%82%E5%B8%B8" target="_blank" rel="external">https://github.com/ChenYilong/iOSInterviewQuestions/blob/master/01%E3%80%8A%E6%8B%9B%E8%81%98%E4%B8%80%E4%B8%AA%E9%9D%A0%E8%B0%B1%E7%9A%84iOS%E3%80%8B%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88/%E3%80%8A%E6%8B%9B%E8%81%98%E4%B8%80%E4%B8%AA%E9%9D%A0%E8%B0%B1%E7%9A%84iOS%E3%80%8B%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E4%B8%8A%EF%BC%89.md#18-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%BC%9A%E6%8A%A5unrecognized-selector%E7%9A%84%E5%BC%82%E5%B8%B8</a></p>
-
           
+这是一篇复习的笔记,梳理自己的知识点,加深理解.
+[TOC]
+Objective-C 中的消息机制在OC中,方法的真正实现是在运行时绑定的,这是于 Swift 最大的不同, Swift 是在编译时.编译器会将消息的发送转换为对 objc_msgSend方法的调用.12OBJC_EXPORT voi
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/08/Objective-C 中的消息发送/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -488,20 +459,17 @@
       
         
           
-            <h3 id="1-需求"><a href="#1-需求" class="headerlink" title="1.需求"></a>1.需求</h3><p><img src="http://upload-images.jianshu.io/upload_images/1240939-bca89b83514a1151.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="搜索3.jpg"></p>
-<p>先分析下这个需求,这是一个简单的搜索功能,在你输入一段字符后会得到后端返回的搜索结果,很常见.但是问题是需要将你输入的字符串在搜索结果中变色,那就要得到子串在父串中的位置.</p>
-<h4 id="其实就是在一个字符串里面匹配另一个字符串-然后如果匹配成功返回在主串中子串的-startIndex"><a href="#其实就是在一个字符串里面匹配另一个字符串-然后如果匹配成功返回在主串中子串的-startIndex" class="headerlink" title="其实就是在一个字符串里面匹配另一个字符串,然后如果匹配成功返回在主串中子串的 startIndex."></a>其实就是在一个字符串里面匹配另一个字符串,然后如果匹配成功返回在主串中子串的 startIndex.</h4><h3 id="2-算法分析"><a href="#2-算法分析" class="headerlink" title="2.算法分析"></a>2.算法分析</h3><p>说完需求,再来看算法,其实看完这个需求我就想到在 leetCode 上刷过的一道题 <a href="https://leetcode.com/problems/implement-strstr/#/description" target="_blank" rel="external">链接</a>.<br>以下图来分析:<br><img src="http://upload-images.jianshu.io/upload_images/1240939-b569366d7eac9b6f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="1.png"><br>首先遍历父串,得到与子串中第一个字符相等的 index,然后在遍历子串,比较子串与父串 index 位之后字符是否相等.如果不相等,那么继续遍历父串得到下一个 index, 直到找到子串匹配父串或者没找到退出循环.<br>这是个简单的思路,就直接贴代码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">/*</div><div class="line"> impStr()</div><div class="line"> * Time Complexity: O(nm), Space Complexity: O(n)</div><div class="line"> */</div><div class="line">func impStr(haystack: String, needle: String) -&gt; Int &#123;</div><div class="line">    let hChars = Array(haystack.characters)</div><div class="line">    let nChars = Array(needle.characters)</div><div class="line"></div><div class="line">    guard hChars.count &gt;= nChars.count else &#123;</div><div class="line">        return -1</div><div class="line">    &#125;</div><div class="line">    guard nChars.count != 0 else &#123;</div><div class="line">        return 0</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    for i in 0...(hChars.count - nChars.count) &#123;</div><div class="line">        // 找到父串中与子串第一个字符相等的 index</div><div class="line">        if hChars[i] == nChars[0] &#123;</div><div class="line">            for j in 0..&lt;nChars.count &#123;</div><div class="line">                // 如果子串某一位和父串不相等,退出循环</div><div class="line">                if hChars[i+j] != nChars[j] &#123;</div><div class="line">                    break</div><div class="line">                &#125;</div><div class="line">                // 找到子串匹配父串</div><div class="line">                if j + 1 == nChars.count &#123;</div><div class="line">                    return i</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return -1</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p> 小需求搞定,easy!<br>但是…时间复杂度是O(nm)啊…再优化下?</p>
-<h3 id="3-算法优化"><a href="#3-算法优化" class="headerlink" title="3.算法优化"></a>3.算法优化</h3><p>再回头看看上面的分析,在子串某一位匹配失败后,父串开始下一次循环,然后之前已经对齐的子串错开,那么父串的匹配必然失败,在上面的算法中没有处理这一块信息,如果有一个很长的子串到最后几位才匹配失败的话,那这个算法的效率就非常低下,毕竟是O(nm)的复杂度.<br>那有什么办法的?</p>
-<h4 id="KMP算法"><a href="#KMP算法" class="headerlink" title="KMP算法"></a>KMP算法</h4><p>KMP 算法会利用之前已经匹配成功的部分子串来减少父串的循环次数,当子串匹配失败后,不去让父串继续遍历,而且通过移动子串的 index 来重新开始下一次匹配.</p>
-<h4 id="KMP-算法小解"><a href="#KMP-算法小解" class="headerlink" title="KMP 算法小解"></a>KMP 算法小解</h4><p><img src="http://upload-images.jianshu.io/upload_images/1240939-a648c6b1ff609a1b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2.png"><br>从上图来分析下 KMP 的流程,在第一次子串的最后一位<code>D</code>与父串<code>E</code>不相等,此时父串<code>ABCDAB</code>与子串的<code>ABCDAB</code>是匹配的,此时父串和子串拥有相同的前缀<code>AB</code>,如果父串下次循环的其实位置就是<code>AB</code>时,就是父串的后缀和子串的前缀对齐,那么下一次匹配开始时已经成功匹配了两个字符,然后继续匹配.<br>不难看出,这个算法充分利用了匹配好的字符串,减少了父串循环的次数,但是问题是需要去计算匹配成功的字符串的是否存在相同的前缀与后缀,怎么计算之后再说,先看子串移动的位数也就是父串循环的 index的起始位置的偏移量的计算.<br><code>父串向右偏移的位数 = 匹配成功的字符串长度 - 已匹配成功的字符串的最大公共前缀后缀长度</code><br>上图: 父串向右偏移的位数(4) = = 匹配成功的字符串长度(6) - 已匹配成功的字符串的最大公共前缀后缀长度(2)<br>那就需要另一个算法来计算一个字符串的最大公共前缀后缀长度,贴一下算法:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">func getNext(patternStr: String) -&gt; [Int] &#123;</div><div class="line">     let count = patternStr.characters.count</div><div class="line">     var k = -1</div><div class="line">     var next = Array(repeating: -1, count: count)</div><div class="line">     for var j in stride(from: 0, to: count - 1, by: 1) &#123;</div><div class="line">        while (k != -1 &amp;&amp; patternStr[patternStr.index(patternStr.startIndex, offsetBy: j)] != patternStr[patternStr.index(patternStr.startIndex, offsetBy: k)]) &#123;</div><div class="line">            k = next[k]</div><div class="line">         &#125;</div><div class="line">         k += 1</div><div class="line">         j += 1</div><div class="line">         next[j] = k</div><div class="line">      &#125;</div><div class="line">      return next</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>这个函数入参就是子串,得到的一个等于子串 length的字符串,每个 index 是除了当前 character 的最大前后缀长度.</p>
-<h5 id="字符串匹配"><a href="#字符串匹配" class="headerlink" title="字符串匹配"></a>字符串匹配</h5><p>计算完成 next数组之后,接下来就可以用这个数组去在父串中找到子串的出现位置,假设匹配到 i 位置时,父串匹配了子串的第一个character, 接下来就要比较父串的 i+1和子串的1来匹配,直到出现第j 个位置不匹配,那么就将子串中0..<j的字符串去从 next="" 数组中找到最长公共前后缀长度.接下来就讲父串的="" i偏移="" 数组中得到的="" index,然后继续匹配.="" <figure="" class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">// KMP 算法 字符串匹配</div><div class="line">func strStr(_ haystack: String, _ needle: String) -&gt; Int &#123;</div><div class="line">    guard haystack.characters.count &gt;= needle.characters.count else &#123;</div><div class="line">        return -1</div><div class="line">    &#125;</div><div class="line">    guard needle.characters.count != 0 else &#123;</div><div class="line">        return 0</div><div class="line">    &#125;</div><div class="line">    guard haystack.contains(needle) else &#123;</div><div class="line">        return -1</div><div class="line">    &#125;</div><div class="line">    var indexI = haystack.startIndex</div><div class="line">    var indexJ = needle.startIndex</div><div class="line">    var j = 0</div><div class="line"></div><div class="line">    let next = getNext(patternStr: needle)</div><div class="line"></div><div class="line">    while (indexI &lt; haystack.endIndex &amp;&amp; indexJ &lt; needle.endIndex) &#123;</div><div class="line">        if j == -1 || haystack[indexI] == needle[indexJ] &#123;</div><div class="line">            j += 1</div><div class="line">            if indexJ == needle.index(before: needle.endIndex) &#123;</div><div class="line">                return haystack.distance(from: indexJ, to: indexI)</div><div class="line">            &#125;</div><div class="line">            indexI = haystack.index(indexI, offsetBy: 1)</div><div class="line">            indexJ = needle.index(indexJ, offsetBy: 1)</div><div class="line">        &#125; else &#123;</div><div class="line">            let distance = haystack.distance(from: needle.startIndex, to: indexJ)</div><div class="line">            j = next[distance]</div><div class="line">            if j == -1 &#123;</div><div class="line">                indexJ = needle.startIndex</div><div class="line">            &#125; else &#123;</div><div class="line">                indexJ = needle.index(needle.startIndex, offsetBy: j)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return -1</div><div class="line">&#125;</div></pre></td></tr></table></j的字符串去从></p>
-<p>KMP 算法的复杂度是 O(m+n),比之前的O(mn)好多了,基本上这个需求也就可以完美收工了.</p>
-<h3 id="4-闲话"><a href="#4-闲话" class="headerlink" title="4.闲话"></a>4.闲话</h3><p>其实对客户端来说,算法重要不重要呢?能不能用到呢?<br>其实我的答案是重要,当你遇到一个类似我遇到的这种需求,不管你用了怎么耗时的算法完成,从 UI 的表现来说可能都一样,但是会觉得不够好,还可以去优化,我觉得这才是能让自己去不断进步的一种想法.</p>
-<h3 id="5-参考"><a href="#5-参考" class="headerlink" title="5.参考"></a>5.参考</h3><p><a href="">http://www.ruanyifeng.com/blog/2013/05/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm.html</a><br><a href="">http://blog.csdn.net/yutianzuijin/article/details/11954939/</a><br><a href="">https://github.com/cbangchen/SwiftAlgorithms</a></p>
-
-          
+          1.需求
+先分析下这个需求,这是一个简单的搜索功能,在你输入一段字符后会得到后端返回的搜索结果,很常见.但是问题是需要将你输入的字符串在搜索结果中变色,那就要得到子串在父串中的位置.
+其实就是在一个字符串里面匹配另一个字符串,然后如果匹配成功返回在主串中子串的 startIndex.2.算法分析说完
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/04/22/一个需求引发的算法及优化(KMP算法)/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -618,36 +586,18 @@
       
         
           
-            <blockquote>
-<p>前提<br>最近做了一次组内分享,这个 idea 来自去沪江的分享会听到的,学到了一些,也分享给组内的小伙伴.</p>
-</blockquote>
-<h3 id="什么是卡顿"><a href="#什么是卡顿" class="headerlink" title="什么是卡顿?"></a>什么是卡顿?</h3><p>这件事要从RunLoop开始，RunLoop是一个60FPS[注1]的回调，也就是说每16.7ms绘制一次屏幕，也就是我们需要在这个时间内完成缓冲区创建，缓冲区内容的绘制这些是CPU的工作；然后把缓冲区交给GPU渲染，这里包括了多个View的拼接(Compositing),纹理的渲染(Texture)等等，最后Display到屏幕上。但是如果你在16.7ms内做的事情太多，导致CPU，GPU无法在指定时间内完成指定的工作，那么就会出现卡顿现象，也就是丢帧。</p>
-<h4 id="用户能感受到的卡顿"><a href="#用户能感受到的卡顿" class="headerlink" title="用户能感受到的卡顿:"></a>用户能感受到的卡顿:</h4><p>1.页面的 FPS 降低,滑动时有困顿;<br>2.页面卡死,无法响应;<br>3.主线程的 Runloop 执行了很久;</p>
-<h4 id="可能是什么原因导致了卡顿"><a href="#可能是什么原因导致了卡顿" class="headerlink" title="可能是什么原因导致了卡顿:"></a>可能是什么原因导致了卡顿:</h4><p>1.死锁:主线程拿到锁 A, 需要锁 B;子线程拿到锁 B,需要锁 A,相互等待导致死锁;<br>2.抢锁:主线程需要读取 DB,子线程在插入数据.<br>3.主线程大量 IO.<br>4.主线程大量计算.<br>5.大量的UI、复杂的UI绘制.</p>
-<h3 id="屏幕的成像原理"><a href="#屏幕的成像原理" class="headerlink" title="屏幕的成像原理"></a>屏幕的成像原理</h3><p><img src="http://upload-images.jianshu.io/upload_images/1240939-6aec999508e35714.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="幻灯片06.jpg"><br>iOS的显示系统是由 Vsync 脉冲信号驱动的, Vsync 脉冲信号由硬件时钟生成,大约每秒钟发出60次, iPhone 采用的双缓冲,安卓在4.1之后是三缓冲.[注2]<br>通常来说,计算机系统中的 CPU,GPU, 显示器的协同工作是:<br>1.CPU 计算好显示内容提交到 GPU;<br>2.GPU 渲染完成后将渲染结果放入 Back Buffer(第一缓冲区);<br>3.然后等待显示器发的垂直同步信号(VSync),Frame Buffer(第二缓冲区)copy 第一缓冲区的显示内容<br>4.显示屏经过数模转换显示出来.<br>所以要避免卡顿就要在16.7ms 内完成第一缓冲区的创建,所以我们所能做的优化绝大部分要在CPU,GPU这两部分.</p>
-<h3 id="如何使页面流畅"><a href="#如何使页面流畅" class="headerlink" title="如何使页面流畅"></a>如何使页面流畅</h3><h4 id="从CPU入手"><a href="#从CPU入手" class="headerlink" title="从CPU入手:"></a>从CPU入手:</h4><p>先看看CPU要做的事情:<br>1.对象创建;<br>2.布局计算;<br>3.复杂算法;<br>4.AutoLayout;<br>5.文本图片的绘制;<br>这仅仅是列出一小部分CPU的工作,可以尝试如何从以上几条来优化:<br>1.对象创建:对象的创建会分配内存、调整属性、文件的 IO等操作,这些都比较占 CPU的资源,如果一个<br>对象的创建会分配内存、调整属性、甚至还有读取文件等操作</p>
-<h4 id="从GPU入手"><a href="#从GPU入手" class="headerlink" title="从GPU入手:"></a>从GPU入手:</h4><p>GPU的职责:根据CPU提供的内容进行渲染,输出到屏幕上.<br>在 Core Animation的组成部分中, OpenGL ES 是直接调用 GPU 进行渲染的.它有两种渲染方式:</p>
-<ul>
-<li>On-Screen Rendering</li>
-<li>Off-Screen Rendering:是指GPU在当前屏幕缓冲区以外新开辟一个缓冲区进行渲染操作.</li>
-</ul>
-<p>##### 为什么离屏渲染会带来性能消耗?<br>1.创建新的缓冲区<br>2.多次上下文切换</p>
-<p>##### 离屏渲染的触发方式<br>1.光栅化(shouldRasterize)[注3]<br>2.遮罩(masks)<br>3.阴影(shadows)<br>4.不透明(opacity)<br>5.圆角</p>
-<h3 id="更多可优化点"><a href="#更多可优化点" class="headerlink" title="更多可优化点:"></a>更多可优化点:</h3><ul>
-<li>异步绘制</li>
-<li>算法优化</li>
-<li>AsyncDisplayKit</li>
-<li>…</li>
-</ul>
-<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
-<li>沪江技术沙龙的一篇 session</li>
-<li><a href="http://blog.ibireme.com/" target="_blank" rel="external">ibireme的 blog</a></li>
-</ul>
-<h3 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h3><h3 id="注"><a href="#注" class="headerlink" title="注:"></a>注:</h3><p>注1.FPS是图像领域中的定义，是指画面每秒传输帧数，通俗来讲就是指动画或视频的画面数。FPS是测量用于保存、显示动态视频的信息数量。每秒钟帧数愈多，所显示的动作就会愈流畅</p>
-<p>注2.通常来说，计算机系统中 CPU、GPU、显示器是以上面这种方式协同工作的。CPU 计算好显示内容提交到 GPU，GPU 渲染完成后将渲染结果放入帧缓冲区，随后视频控制器会按照 VSync 信号逐行读取帧缓冲区的数据，经过可能的数模转换传递给显示器显示</p>
-<p>注3..当一个列表视图中出现大量圆角的 CALayer，并且快速滑动时，可以观察到 GPU 资源已经占满，而 CPU 资源消耗很少。这时界面仍然能正常滑动，但平均帧数会降到很低。为了避免这种情况，可以尝试开启 CALayer.shouldRasterize 属性，但这会把原本离屏渲染的操作转嫁到 CPU 上去。</p>
-
           
+前提最近做了一次组内分享,这个 idea 来自去沪江的分享会听到的,学到了一些,也分享给组内的小伙伴.
+
+什么是卡顿?这件事要从RunLoop开始，RunLoop是一个60FPS[注1]的回调，也就是说每16.7ms绘制一次屏幕，也就是我们需要在这个时间内完成缓冲区创建，缓冲区内容的绘制这些是CP
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/18/如何做一个流畅的UI/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -764,37 +714,19 @@
       
         
           
-            <p>项目最近由 http 转成了 https, 但是charles 不能抓 https 的包,而搜各种资料去发现都因为 charles 版本过低无法用,所以记录下我的解决办法.</p>
-<blockquote>
-<p>Charles为什么能抓 https?</p>
-</blockquote>
-<p>都知道 http是明文传输,而 https 的出现就是为了解决这个问题,https 协议是由 SSL+http 协议构建的加密传输网络协议.但既然是加密的,那为什么能抓到?</p>
-<p>先看看 Charles 官网是怎么解释的:</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-d98dac2768f1f4ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="charles_ssl.png"></p>
-<p>很明显, “man-in-middle”,就是使用中间人攻击.<br>因为 https 使用的是非对称加密,那就要了解https的传输交互过程:<br><img src="http://upload-images.jianshu.io/upload_images/1240939-cd98b2a84827ecbc.jpg" alt="https 传输过程.jpg"></p>
-<p>######1.首先是客户端发起 https 请求,链接到server的443接口</p>
-<p>######2.服务端收到请求后把公钥传给客户端</p>
-<p>######3.客户端解析证书,如果没有问题,用加密算法生成一个对称密钥,然后用公钥加密</p>
-<p>######4.把加密后的值传给服务端</p>
-<p>######5.服务端用私钥解密后,之后的通信都是对已对称密钥进行加密和解密的通信<br>看起来很安全了吧,但中间人攻击又是怎么做到的呢?</p>
-<p>######第一步,当客户端发起 SSL握手时,中间人劫持用户请求然后中间中伪装客户端发起 SSL握手.</p>
-<p>######第二步,服务端会发送公钥给中间人,当然中间人是有一对自己的公钥和私钥,中间人会把中间人自己的公钥发送给客户端.</p>
-<p>######第三步,客户端拿到公钥会根据加密算法加密,发送对称密钥,这时候中间人利用自己的私钥可以解出对称密钥,这时候中间人已经拿到公钥和对称密钥,再用服务端发给中间人的公钥来加密对称密钥,发送给服务器.</p>
-<p>######第四步,之后客户端和服务端所有的请求的数据都会被中间人利用对称密钥解密得到所有的信息.</p>
-<p>当然 charles 使用的中间人攻击必须要我们要信任它的证书,不然还是不能得到数据,https是可以防止中间人攻击的，因为服务器的公钥是用证书的,</p>
-<p>charles伪造的证书一般浏览器会警告，所以我们需要将charles的证书认为可靠的。从而实现中间人。<br>以上之后我了解的一点点的相关知识.</p>
-<hr>
-<blockquote>
-<p>进入教程</p>
-</blockquote>
-<p>Charles版本: V4.0.2<br>第一步:点击install Charles Root Certificate, 之后会跳到钥匙串<br><img src="http://upload-images.jianshu.io/upload_images/1240939-a1aa4b2c1ffa65a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="step1.png"></p>
-<p>第二步:找到 Charles 的证书然后选择使用此证书时: 始终信任.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-763665ea38fa64cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="step2"></p>
-<p>第三步:在手机上安装 Charles 的根证书<br><img src="http://upload-images.jianshu.io/upload_images/1240939-fef573a8e0f9df0f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="step3"></p>
-<p>第四步:在手机上安装完之后,回到 Charles-Proxy-SSLProxying Setting,<br>把需要劫持的 host加上,端口号443,注意这里的 host 可以使用通配符也可以直接填 host.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-74b37e10466603c7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="step4.png"></p>
-<hr>
-<p>到这里就差不多教程就结束了,这次在 charles 上抓 https 只是工作中的一个小插曲,但是去了解为什么能抓到让我产生兴趣,在去深入了解的过程中也加深和修正了一些知识点,记录为文.</p>
+          项目最近由 http 转成了 https, 但是charles 不能抓 https 的包,而搜各种资料去发现都因为 charles 版本过低无法用,所以记录下我的解决办法.
 
-          
+Charles为什么能抓 https?
+
+都知道 http是明文传输,而 https 的出现就是为了解决这个问题,https
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/10/ Charles如何抓https(原理、教程)/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -911,25 +843,18 @@
       
         
           
-            <blockquote>
-<p>虽然2017年已经过去了一个多月,但还是记录一点文字来做下纪念吧</p>
-</blockquote>
-<h2 id="2016年的总结"><a href="#2016年的总结" class="headerlink" title="2016年的总结"></a>2016年的总结</h2><p>2016年总体来说是比较成功的一年,这一年年初就离开了之前的公司,也是因为个人没有多考虑清楚,拿到 offer 也没有多考虑就去,这让我自己也发现自己的一个缺点,就是很容易充满乐观情绪,偶尔极度乐观.<br>新换到的这家公司是一家做电竞的公司,主要是做电竞比赛然后通过比赛拉到的用户去做线下网咖的一些活动.不过这家公司极度坑爹的是:整个公司对整个App并没有太大的感觉,就是由技术部的人来瞎鼓捣,而且技术部门就是 CTO自己决定需求产品,还要插手UED,整个就是一个 Fxxk,不过有这样一个领导就会有一堆关系很不错的同事,和他们一起工作也真是不错的一段经历.<br>10月份真是一个跌宕起伏的一个月,9月底被裁员(真是年轻,没有谈好自己的利益),十一去了女朋友家见了家长,之后就从虹口搬到了浦东,结束了和朋友同居的日子,开始了两个人的小日子.工作上也换到了一个做房地产信息的公司,也算是成功跳槽.<br>从个人技术来说,2015年开始学习 Swift 到今年一直在工作中使用和推动 Swift,庆幸自己一直有志同道合的朋友,在学习的道路上确实有点艰辛但是很值得. 今年零零散散还捡起了 Python 又学习了一点 shell, 把还给老师的 SQL又复习了一遍,感觉程序员的生活总会有新的东西出现驱动我一直去学习.</p>
-<blockquote>
-<p>持续学习是程序员的唯一必备技能</p>
-</blockquote>
-<p>谈谈新的工作吧,有满意也有不满意的.公司在技术方面,尤其是移动端这边真是人员严重不足,我去的时候居然是第一 iOS,公司在制度上也不是很完善,但是好处是有人在推动这个,也算不错.我去是接手一个新项目,也就开发了一个多月但是整个项目的代码让我最开始每天都处在极度恶心的状态,代码没有任何规范可言, UI已经不能用丑来形容,整个项目代码水平就是我最开始学的程度吧….一度让我想要不要跑路得了<br>不过我是一个忍不了的处女座,熟悉项目之后就是改改改,先把这个OC 项目改成 OC+Swift 混编,所有新的需求都用 Swift 开发,抽时间加班来把原来项目按模块重写,这其中也是踩了不少坑,对自己的 OC水平也有不少的提高,在看别人的代码的时候也可以反过来提高自己,也算是让自己换个方向进步吧. </p>
-<h2 id="2017年的计划"><a href="#2017年的计划" class="headerlink" title="2017年的计划"></a>2017年的计划</h2><p>有幸跟一位有丰富经验的 CTO 交流了数个小时,让我受益匪浅.不仅仅是技术上的而是对自己职业规划和未来发展,技术人在低头做技术的同时也要偶尔抬头看看外面的风向.2017年可能会是大数据和AI技术爆发的一年,而移动端的红利已经消失整个行业趋于理性,现在对移动端的开发人员来说单一的技能已经不足以竞争一份职位,我也得好好想想自己的职业规划了.</p>
-<blockquote>
-<p>职业规划是每个时段都必须要去想的一件事</p>
-</blockquote>
-<p>如果继续在做移动端开发的话,我觉得前端的知识是必须要了解的,未来的趋势可能是泛前端开发,就是原生的开发者可能要在原生和前端之间来回切换来快速开发,但是原生开发者的优势还是很大的.<br>如果去做了数据分析,那么统计学和 Python的学习就得马上来进行了,好在是数学系出身还不算从零开始.</p>
-<blockquote>
-<p>定个小目标:每个月读一两本书,最好有读书心得,范围不限.</p>
-</blockquote>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>码了这么多,絮絮叨叨,但是2016年这一年我是对自己满意的,希望新的一年也更好,加油!</p>
-
           
+虽然2017年已经过去了一个多月,但还是记录一点文字来做下纪念吧
+
+2016年的总结2016年总体来说是比较成功的一年,这一年年初就离开了之前的公司,也是因为个人没有多考虑清楚,拿到 offer 也没有多考虑就去,这让我自己也发现自己的一个缺点,就是很容易充满乐观情绪,偶尔极度乐观.新换到的这家公
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/03/2016年年度总结和2017年年度计划/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1046,27 +971,15 @@
       
         
           
-            <h3 id="1-先来看看什么是-LLVM"><a href="#1-先来看看什么是-LLVM" class="headerlink" title="1.先来看看什么是 LLVM?"></a>1.先来看看什么是 LLVM?</h3><p>LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年,  Chris Lattner开发了这一套编译器工具库套件.后来随着 LLVM的发展,LLVM可以用于常规编译器，JIT编译器，汇编器，调试器，静态分析工具等一系列跟编程语言相关的工作。</p>
-<blockquote>
-<p>Chris Lattner:<br>熟悉 Swift 的开发者肯定知道这位大神的名字,他于2010年开始编写 Swift 语言,而且一个人实现了 Swift 的大部分基础架构.他也是 LVVM 以及 Clang的主要开发者.</p>
-</blockquote>
-<h3 id="2-GCC-gt-LLVM"><a href="#2-GCC-gt-LLVM" class="headerlink" title="2.GCC -&gt; LLVM"></a>2.GCC -&gt; LLVM</h3><p>GCC是 Xcode早期使用的一个强大的编译器.这个编译器被移植到各种系统中,其中就是 Mac OSX 操作系统,所以这就反映在 Xcode中,在早期的 Xcode 调试代码的一个工具就是 GDB,它是GNU调试器.</p>
-<p>####why换成LLVM呢?<br>Apple（包括中后期的NeXT） 一直使用GCC作为官方的编译器。GCC作为开源世界的编译器标准一直做得不错，但Apple对编译工具会提出更高的要求。<br>一方面，是Apple对Objective-C语言（甚至后来对C语言）新增很多特性，但GCC开发者并不买Apple的帐——不给实现，因此索性后来两者分成两条分支分别开发，这也造成Apple的编译器版本远落后于GCC的官方版本。另一方面，GCC的代码耦合度太高，不好独立，而且越是后期的版本，代码质量越差，但Apple想做的很多功能（比如更好的IDE支持）需要模块化的方式来调用GCC，但GCC一直不给做。甚至最近，《GCC运行环境豁免条款 （英文版）》从根本上限制了LLVM-GCC的开发。 所以，这种不和让Apple一直在寻找一个高效的、模块化的、协议更放松的开源替代品.<a href="http://www.jianshu.com/p/aa27c51c74fb">原文链接</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">版本                 |    编译器版本 </div><div class="line">Xcode3之前    |           GCC        </div><div class="line">Xcode3            |      GCC与 LLVM混合编译器     </div><div class="line">Xcode4            |      LLVM-GCC 成为默认编译器    </div><div class="line">Xcode4.2         |  LLVM3.0成为默认编译器</div><div class="line">Xcode5            | LLVM5.0, 完成 GCC到LLVM的过渡</div></pre></td></tr></table></figure>
-<h3 id="3-LLVM-与-Clang"><a href="#3-LLVM-与-Clang" class="headerlink" title="3.LLVM 与 Clang"></a>3.LLVM 与 Clang</h3><p>Clang是一个C、C++、OC语言的轻量级编译器。源代码发布于BSD协议下。Clang是由C++编写，基于LLVM，发布于LLVM BSD许可证下的编译器。它与GNU C语言规范几乎完全兼容，并增加了额外的特性。<br>如果说 LLVM是 iOS 的编译器是不太准确的,但说clang 是 iOS 的编译器这也不太准确,因为 clang 是编译器前端(下图中的 Frontend).那编译器又什么?<br>简单来说,编译器就是把我们的 C,C++,OC 代码转成 hard code, 在这个过程中,编译器会对代码做各种分析来保证没有无法编译的错误.</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-c26e5313c3a431d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Three-Phase编译器架构"><br>这里就要说一下LLVM的三层架构:</p>
-<p>####1.Frontend:  这第一层就是 clang, 它支持将多种输入语言(c family)经过一系列处理后生成汇编代码(LLVM JR).</p>
-<p>####2.Commer Optimizer:这第二层是一个优化器,对 LLVM JR 做优化.</p>
-<p>####3.Backend:第三层对不同的平台再将汇编转成 machine code.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-e096bed71a77483f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="摘自孙源在 MDCC2016的 session"></p>
-<p>作为一个 iOS 开发者,个人在学习中主要关注在第一层,对第二层第三层只做了解(hello world level).<br>当按下 Xcode上Run这个按钮之后,我们的编译器做了什么呢?</p>
-<p>####1.预处理(Prepreocess): import, macro, 预处理指令…</p>
-<p>####2.词法分析:(Lexical Analysis):将预处理过的代码文本转化成Toke流</p>
-<p>####3.语法分析:(Semantic Analysis):验证语法是否正确,生成语意节点,组合成抽象语法树.(AST)</p>
-<p>####4.静态分析:(static Analysis):类型检查,找出非语法错误.</p>
-<p>####5.代码生成:(CodeGen-IR):生成 LLVM-JR(汇编)</p>
-<p>TO DO:<br>1.clang插件的使用和研究;<br>2.lldb 调试器的深入学习;</p>
-
-          
+          1.先来看看什么是 LLVM?LLVM 是 Low Level Virutal Machine的简称,它是个编译器框架,用于优化以任意程序语言编写的程序的编译时间(compile-time)、链接时间(link-time)、运行时间(run-time)以及空闲时间(idle-time).在2000年
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/11/18/LLVM-Clang学习笔记/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1183,23 +1096,19 @@
       
         
           
-            <blockquote>
-<p>最近发生一些事情,现在待业在家😭,小伙伴给个内推机会,坐标上海🙏🙏🙏</p>
-</blockquote>
-<hr>
-<h4 id="先聊聊Method-Swizzling"><a href="#先聊聊Method-Swizzling" class="headerlink" title="先聊聊Method Swizzling"></a>先聊聊Method Swizzling</h4><p>从 Objective-C 开始, runtime一直是解决坑爹需求和面试装逼的一大利器,然而聊起 runtime 很多人都第一个想到 Method Swizzling,.因为 Objective-C中调用方法都是动态实现的,当运行时的才确定到底执行哪个方法,而 Method Swizzling 就是利用这个特点来解决很多问题.</p>
-<p>现在关于 Runtime 和 Method Swizzling 的文章太多了,我推荐一篇:<br><a href="http://www.jianshu.com/p/db6dc23834e3">神经病院Objective-C Runtime出院第三天——如何正确使用Runtime</a><br><a href="http://www.jianshu.com/users/12201cdd5d7a/latest_articles">@一缕殇流化隐半边冰霜 </a>大神写的关于 runtime这几篇,看完基本对 runtime 就没什么问题了吧…</p>
-<h4 id="再看看-Swift3-0中的-Method-Swizzling"><a href="#再看看-Swift3-0中的-Method-Swizzling" class="headerlink" title="再看看 Swift3.0中的 Method Swizzling"></a>再看看 Swift3.0中的 Method Swizzling</h4><p>先来看看 swizzling 在 Objective-C 中的注意点:(对比上文链接中)</p>
-<h5 id="1-Swizzling应该总在category的-load中执行-Objective-C"><a href="#1-Swizzling应该总在category的-load中执行-Objective-C" class="headerlink" title="1.Swizzling应该总在category的 +load中执行 ( Objective-C )"></a>1.Swizzling应该总在category的 +load中执行 ( Objective-C )</h5><h4 id="那在-Swift-中-extension-并不是运行时加载的-因此也没有加载时候就会被调用的类似-load-的方法-事实上，Swift-实现的-load-并不是在-app-运行开始就被调用的。基于这些理由，我们使用另一个类初始化时会被调用的方法来进行交换："><a href="#那在-Swift-中-extension-并不是运行时加载的-因此也没有加载时候就会被调用的类似-load-的方法-事实上，Swift-实现的-load-并不是在-app-运行开始就被调用的。基于这些理由，我们使用另一个类初始化时会被调用的方法来进行交换：" class="headerlink" title="那在 Swift 中, extension 并不是运行时加载的, 因此也没有加载时候就会被调用的类似 +load 的方法. 事实上，Swift 实现的 load 并不是在 app 运行开始就被调用的。基于这些理由，我们使用另一个类初始化时会被调用的方法来进行交换："></a>那在 Swift 中, extension 并不是运行时加载的, 因此也没有加载时候就会被调用的类似 +load 的方法. 事实上，Swift 实现的 load 并不是在 app 运行开始就被调用的。基于这些理由，我们使用另一个类初始化时会被调用的方法来进行交换：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">open override static func initialize() &#123;</div><div class="line">    // Method Swizzling</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>这一条部分来自喵神 swiift tips 第二版, 喵神在第三版中删除了 swizzling 这个章节,理由是这部分更多是 Objective-C的内容. 我个人觉得如果在 Swift 中还需要用 Swizzling 这种技术来实现需求, 不如用更 Swifty的方式去解决问题, 函数式或者面向协议等等等😀</p>
-</blockquote>
-<h5 id="2-Swizzling应该总是在dispatch-once中执行"><a href="#2-Swizzling应该总是在dispatch-once中执行" class="headerlink" title="2.Swizzling应该总是在dispatch_once中执行"></a>2.Swizzling应该总是在dispatch_once中执行</h5><h4 id="那么-问题来了-在3-0版本-Dispatch-once-已经被废弃-这怎么办"><a href="#那么-问题来了-在3-0版本-Dispatch-once-已经被废弃-这怎么办" class="headerlink" title="那么,问题来了,在3.0版本 Dispatch once 已经被废弃,这怎么办?"></a>那么,问题来了,在3.0版本 Dispatch once 已经被废弃,这怎么办?</h4><h4 id="刚巧的是前几天群里的老司机-没故事的卓同学-写了篇-译-Swift-3-中实现Dispatch-once扩展"><a href="#刚巧的是前几天群里的老司机-没故事的卓同学-写了篇-译-Swift-3-中实现Dispatch-once扩展" class="headerlink" title="刚巧的是前几天群里的老司机 @没故事的卓同学 写了篇 [译]Swift 3 中实现Dispatch once扩展"></a>刚巧的是前几天群里的老司机 <a href="http://www.jianshu.com/p/640b64faea9a">@没故事的卓同学</a> 写了篇 <a href="http://www.jianshu.com/p/640b64faea9a">[译]Swift 3 中实现Dispatch once扩展</a></h4><p>通过给DispatchQueue实现一个扩展方法来实现 Dispatch once.<br>至于没什么要 dispatch_once呢? 因为 Swizzling会改变全局状态,所以用dispatch_once来确保无论多少线程都只会被执行一次.</p>
-<h4 id="3-Swift自定义类中使用-Method-Swizzling"><a href="#3-Swift自定义类中使用-Method-Swizzling" class="headerlink" title="3. Swift自定义类中使用 Method Swizzling"></a>3. Swift自定义类中使用 Method Swizzling</h4><p>因为Method Swizzling的实现是基于 Objective-C 的动态派发机制,所以有两条限制<br>1.包含 swizzle 方法的类需要继承自 NSObject<br>2.如果要 Swizzle 的是 Swift 类型的方法的话，需要将原方法和替换方法都加上 dynamic 标记，以指明它们需要使用动态派发机制</p>
-<hr>
-<p>上个 sample:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">extension UIViewController &#123;</div><div class="line">    open override static func initialize() &#123;</div><div class="line">        struct Static &#123;</div><div class="line">            static var token = NSUUID().uuidString</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if self != UIViewController.self &#123;</div><div class="line">            return</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        DispatchQueue.once(token: Static.token) &#123; </div><div class="line">            let originalSelector = #selector(UIViewController.viewWillAppear(_:))</div><div class="line">            let swizzledSelector = #selector(UIViewController.xl_viewWillAppear(animated:))</div><div class="line"></div><div class="line">            let originalMethod = class_getInstanceMethod(self, originalSelector)</div><div class="line">            let swizzledMethod = class_getInstanceMethod(self, swizzledSelector)</div><div class="line"></div><div class="line">            </div><div class="line">            //在进行 Swizzling 的时候,需要用 class_addMethod 先进行判断一下原有类中是否有要替换方法的实现</div><div class="line">            let didAddMethod: Bool = class_addMethod(self, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))</div><div class="line">            //如果 class_addMethod 返回 yes,说明当前类中没有要替换方法的实现,所以需要在父类中查找,这时候就用到 method_getImplemetation 去获取 class_getInstanceMethod 里面的方法实现,然后再进行 class_replaceMethod 来实现 Swizzing</div><div class="line"></div><div class="line">            if didAddMethod &#123;</div><div class="line">                class_replaceMethod(self, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))</div><div class="line">            &#125; else &#123;</div><div class="line">                method_exchangeImplementations(originalMethod, swizzledMethod)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    func xl_viewWillAppear(animated: Bool) &#123;</div><div class="line">        self.xl_viewWillAppear(animated: animated)</div><div class="line">        print(&quot;xl_viewWillAppear in swizzleMethod&quot;)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">extension DispatchQueue &#123;</div><div class="line">    private static var onceTracker = [String]()</div><div class="line"></div><div class="line">    open class func once(token: String, block:() -&gt; Void) &#123;</div><div class="line">        objc_sync_enter(self)</div><div class="line">        defer &#123; objc_sync_exit(self) &#125;</div><div class="line"></div><div class="line">        if onceTracker.contains(token) &#123;</div><div class="line">            return</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        onceTracker.append(token)</div><div class="line">        block()</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-
           
+最近发生一些事情,现在待业在家😭,小伙伴给个内推机会,坐标上海🙏🙏🙏
+
+
+先聊聊Method Swizzling从 Objective-C 开始, runtime一直是解决坑爹需求和面试装逼的一大利器,然而聊起 runtime 很多人都第一个想到 Method Swizzling,.因为 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/10/18/Swift3中的 Method Swizzling/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1316,53 +1225,18 @@
       
         
           
-            <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><blockquote>
-<h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>第二次翻译博客,虽然感觉比上一次翻的顺利一点,但是还是磕磕绊绊,不过对自身提高有不少的帮助,若有什么错误,望大家指出.<a href="http://inaka.net/blog/2016/09/16/function-naming-in-swift-3/" target="_blank" rel="external">原文链接</a></p>
-</blockquote>
-<p>昨天我开始将 Jayme 迁移到 Swift3,这是我第一次尝试将 Swift2.2的代码迁移到3.0.整个过程非常繁琐,我不得不承认; Swift3跟之前的版本相比是有很大的不同,而且其中大部分的变化都是突然地,而且得花时间去思考这些变化.但是从我们自己的角度来说: 我写 Swift3,越写越开心.<br>在迁移过程中,有很多很多需要去思考的变化,而且,这不仅仅是翻译代码,而是把整个迁移过程分成很多步骤,然后一点一点,有耐心的迁移.当然,代码的变化仅仅是整个迁移工作的一步.</p>
-<p>如果你已经决定开始迁移你的代码库,那么<a href="http://www.jessesquires.com/migrating-to-swift-3/" target="_blank" rel="external">文字链接</a>是一个很好的帮助.</p>
-<p>我希望在不久的将来,我会把我迁移经验写一篇博文,包括了整个迁移过程并且总结我在迁移过程中做出的大部分决定.但到目前为止,我只能关注我认为最重要的一个:如何正确地写函数签名。</p>
-<p>###基础:<br>让我们开始理解一个观点:Swift3函数命名跟 Swift2的不同.</p>
-<p>在 Swift2中,当你调用一个函数时,对一个函数的第一个参数标签是忽略的,这样写是为了遵守 <a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/CodingGuidelines/Articles/NamingMethods.html" target="_blank" rel="external">Cocoa框架的命名规范</a>,所以我们一直都是这样写:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// Swift 2 </div><div class="line">func handleError(error: NSError) &#123; &#125;</div><div class="line">let error = NSError()</div><div class="line">handleError(error) // 很像 OC</div></pre></td></tr></table></figure></p>
-<p>在 Swift3中,相反,,函数的第一个参数标签可以在函数调用中省略,但在默认情况下,并不能省略:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func handleError(error: NSError) &#123; &#125;</div><div class="line">let error = NSError()</div><div class="line">handleError(error)  // Does not compile! 编译过不了</div><div class="line">// ⛔ Missing argument label &apos;error:&apos; in call</div></pre></td></tr></table></figure></p>
-<p>所以,这样改一下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func handleError(error: NSError) &#123; &#125;</div><div class="line">let error = NSError()</div><div class="line">handleError(error: error)    </div><div class="line">// 但是不得不把 &apos;error&apos; 写了三遍</div><div class="line">// 辣眼睛🙈</div></pre></td></tr></table></figure></p>
-<p>在这一点上，你可以知道你的代码就会变得无聊和重复…<br>也就是说,如果你想在函数调用中省略第一个参数标签.但是在 Swift3中,你必须明确的写成:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func handleError(_ error: NSError) &#123; &#125;</div><div class="line">// 🖐 注意这个下划线!</div><div class="line">let error = NSError()</div><div class="line">handleError(error)  // 跟 Swift2一样</div></pre></td></tr></table></figure></p>
-<blockquote>
-<p>当你运行 Xcode 的迁移工具时,这是个默认的变化</p>
-</blockquote>
-<p>注意函数声明中的下划线,它的意思是当你调用函数是第一个参数不需要标签.这样,我们就可以像 Swift2中那样调用了.</p>
-<p>此外,你可以意识到, Swift3中的函数命名更具有一致性也更容易理解: 所有的参数标签都是一样的,再也没有像第一个参数标签隐藏这样的了.</p>
-<p>这样代码可以通过编译,但是你想写的更 Swifty 的话,你得看看<a href="https://swift.org/documentation/api-design-guidelines/" target="_blank" rel="external"> Swift 3 API design guidelines</a>.</p>
-<blockquote>
-<p>一点点建议:反复阅读<a href="https://swift.org/documentation/api-design-guidelines/" target="_blank" rel="external"> Swift 3 API design guidelines</a>.最好每天早上都读,直到你懂得了用一个新的方式去写 Swift 代码.</p>
-</blockquote>
-<p>Furthermore, you can realize that Swift 3 is more consistent and easier to understand when it comes to functions naming: All parameter labels are treated the same; there is no such thing as treating the first one differently.<br>此外，你可以意识到，3是更一致，更容易理解，当涉及到函数命名：所有的参数标签都是相同的，没有这样的东西作为治疗的第一个不同的。</p>
-<p>###更进一步: 减代码<br>观察这行代码是怎么重复的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">handleError(error)</div></pre></td></tr></table></figure></p>
-<p>为了使它不重复性和更简洁，您可以从函数命名中删除冗余类型的名称：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func handle(_ error: NSError) &#123; /* ... */ &#125;</div><div class="line">let error = NSError()</div><div class="line">handle(error)   // 类型名称减掉了</div><div class="line">// 从函数名看,它是多余的</div></pre></td></tr></table></figure></p>
-<p>这更短，更清晰，更简洁，并鼓励开发人员按照<a href="https://swift.org/documentation/api-design-guidelines/" target="_blank" rel="external"> Swift 3 API design guidelines</a>来开发（是的，读一遍，再次！）<br>注意函数调用是清晰的。我们可以知道函数参数是什么，因为有两个事实：<br>1.我们知道它的类型。<br>2.此外，该类型表示的参数正是预期的代表（在这种情况下毫无疑问是一个错误类型)。</p>
-<p>###减代码并不总是一个问题<br>现在该打起精神,开始小心一点了!</p>
-<p>在很多情况下,上面的例子并没有发生.换言说,参数的类型不能反映这个参数本身.<br>来看看下面的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// Swift 2</div><div class="line">func requestForPath(path: String) -&gt; URLRequest &#123;  &#125;</div><div class="line">let request = requestForPath(&quot;local:80/users&quot;)</div></pre></td></tr></table></figure></p>
-<p>如果你试着将这个代码迁移到 Swift3,根据我们之前学的,你可能会写出这样的代码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func request(_ path: String) -&gt; URLRequest &#123;  &#125;</div><div class="line">let request = request(&quot;local:80/users&quot;)</div></pre></td></tr></table></figure></p>
-<p>但是这样写还是有点小问题而且可读性不高,让我们在修改一下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// Swift 3</div><div class="line">func request(for path: String) -&gt; URLRequest &#123;  &#125;</div><div class="line">let request = request(for: &quot;local:80/users&quot;)</div></pre></td></tr></table></figure></p>
-<p>现在，虽然这是更具可读性，它并没有解决我上面提到的问题。</p>
-<p>在调用这个函数的那一刻，你怎么能知道你需要传递的for是需要什么？因为Swift是静态类型的,所有你可以事先知道是该参数预期是字符串类型，但是你需要传入的 path在调用的时候并不知道for 后面跟的是什么参数.</p>
-<p>有很多这些场景中的参数类型是没有意义的，应该代表什么时，例如：<br>1.一个String有时候并不总是代表 path<br>2.一个int并不总是代表一个状态码。<br>3.[String: String]不总是代表一个 http 标头</p>
-<blockquote>
-<p>⚠️ 我的建议: 减代码的时候一定要小心!✄<br>回到代码，来解决这个问题第一种方法可以追加参数的名称为参数的标签，使得它在结果明确：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">func request(forPath path: String) -&gt; URLRequest &#123;  &#125;</div><div class="line">let request = request(forPath: &quot;local:80/users&quot;)</div><div class="line">// for改成了forPath</div></pre></td></tr></table></figure></p>
-</blockquote>
-<p>此代码是准确的，可编译并遵循了设计规范。🎉万岁！</p>
-<blockquote>
-<p>你可以读到这里，但等等，最好的部分是尚未到来…</p>
-</blockquote>
-<p>现在，请注意在函数声明这一措辞：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">func request(forPath path: String) -&gt; URLRequest &#123;  &#125;</div><div class="line">// The word &apos;path&apos; appears twice</div></pre></td></tr></table></figure></p>
-<p>虽然这并不是丑代码，在大多数情况下，这仍然是正确的，而且编译得很顺利，但有一种方法，以避免它。<br>更多关于这在下面的部分……</p>
-<p>###一些你可能不知道的小技巧<br>这个想法很简单：让参数类型反映了它的内容，目的就是能够尽量的减少代码。<br>如果我告诉你<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">typealias Path = String      </div><div class="line">func request(for path: Path) -&gt; URLRequest &#123;  &#125;</div><div class="line">let request = request(for: &quot;local:80/users&quot;)</div></pre></td></tr></table></figure></p>
-<p>在这种情况下，你的参数的类型和入参是具有一致性，因为参数的类型被定义了一个typealias, 把 Path的别名设为 String.</p>
-<p>这样，你的函数仍然是直观，可读的，明确的，但不重复。<br>同样的，你能想到的，可能在其他常见的场景利用typealias的其他一些例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">typealias Path = String</div><div class="line">typealias StatusCode = Int</div><div class="line">typealias HTTPHeader = [String: String]</div><div class="line">// etc...</div></pre></td></tr></table></figure></p>
-<p>这将使你写更清晰的代码，就像我们刚才看到的。<br>然而，极端都不好：输入别名增加了代码的复杂性，你的代码，甚至会变得更多，如果它们嵌套……所以，不要虐待自己.🖐虽然在某些情况下，他们可以帮你很好，因为我们只看到有时它们实际上是不必要的，只会使你的代码难以效仿。</p>
-<p>###结论<br>在很多情况下,你会在 Swift3 的函数命名中栽个跟头.<br>但这些代码片段抵过再多的博文:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">func remove(at position: Index) -&gt; Element &#123;  &#125;</div><div class="line">employees.remove(at: x)</div><div class="line"></div><div class="line">func remove(_ member: Element) -&gt; Element?  &#123;  &#125;</div><div class="line">allViews.remove(cancelButton)</div><div class="line"></div><div class="line">func url(forPath path: String) -&gt; URL &#123;  &#125;</div><div class="line">let url = url(forPath: &quot;local:80/users&quot;)</div><div class="line"></div><div class="line">typealias Path = String // Alternative</div><div class="line">func url(for path: Path) -&gt; URL &#123;  &#125;</div><div class="line">let url = url(for: &quot;local:80/users&quot;)</div><div class="line"></div><div class="line">func entity(from dictionary: [String: Any]) -&gt; Entity &#123; /* ... */ &#125;</div><div class="line">let entity = entity(from: [&quot;id&quot;: &quot;1&quot;, &quot;name&quot;: &quot;John&quot;])</div><div class="line">(就好好读系统的 API)</div></pre></td></tr></table></figure></p>
+          Quick Start
+写在前面第二次翻译博客,虽然感觉比上一次翻的顺利一点,但是还是磕磕绊绊,不过对自身提高有不少的帮助,若有什么错误,望大家指出.原文链接
 
-          
+昨天我开始将 Jayme 迁移到 Swift3,这是我第一次尝试将 Swift2.2的代码迁移到3.0.整个过程非常繁琐,我不得不承认; 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/10/09/[译] Swift3中的函数命名/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1479,37 +1353,19 @@
       
         
           
-            <blockquote>
-<p>本文主要是从 Hashable作为入口,了解Swift3的标准库协议.再研究从自定义的类去遵循 Sequence和 Collection 两大基础协议,从而加深Swift的面向协议编程的思想</p>
-</blockquote>
-<p>入坑 Swift的时候看了一段演讲,<a href="http://www.cocoachina.com/swift/20160107/14868.html" target="_blank" rel="external">这是链接</a>.这让我对Swift的面向协议编程有了兴趣.</p>
-<p>Swift中，大量内置类如Dictionary，Array，Range，String都使用了协议,在学习的过程中我把自己的学习笔记记录下来.</p>
-<p>2016-09-14: 更新完 Xcode8以后,根据swift2.2写好的,又要重写一遍了…..<br></p>
-<hr>
-<p>##先看看Hashable<br>哈希表是一种基础的数据结构.,Swift中字典具有以下特点：字典由两种范型类型组成，其中 key 必须实现 Hashable 协议.关于 swift 中字典是怎么实现的,可以看<a href="http://www.jianshu.com/p/0caa1076b751">这篇</a> .<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public protocol Hashable : Equatable &#123;</div><div class="line">    public var hashValue: Int &#123; get &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>可以看到 Hashable遵循了 Equable,那再来看看 Equable<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public protocol Equatable &#123;</div><div class="line">    public func ==(lhs: Self, rhs: Self) -&gt; Bool</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>看来遵循 Equable 都必须重载这个 == ,来定义自己的判等方法.<br>上 sample:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">struct MyPoint: Hashable, Comparable &#123;</div><div class="line">    var x: Int</div><div class="line">    var y: Int</div><div class="line">    var hashValue: Int &#123;</div><div class="line">        get &#123;</div><div class="line">            return x.hashValue + y.hashValue</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">func ==(lhs: MyPoint, rhs: MyPoint) -&gt; Bool &#123;</div><div class="line">    return lhs.hashValue == rhs.hashValue</div><div class="line">&#125;</div><div class="line"></div><div class="line">let pointA = MyPoint(x: 1, y: 1)</div><div class="line">let pointB = MyPoint(x: 1, y: 1)</div><div class="line">let pointC = MyPoint(x: 1, y: 2)</div><div class="line">pointA == pointB //true</div><div class="line">pointA == pointC //false</div></pre></td></tr></table></figure></p>
-<p>如果需要比较大小需要遵循 Comparable这个协议,协议需要内容就不贴了,直接上 code:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">func &lt;(lhs: MyPoint, rhs: MyPoint) -&gt; Bool &#123;</div><div class="line">    return lhs.hashValue &lt; rhs.hashValue</div><div class="line">&#125;</div><div class="line">func &lt;=(lhs: MyPoint, rhs: MyPoint) -&gt; Bool &#123;</div><div class="line">    return lhs.hashValue &lt;= rhs.hashValue</div><div class="line">&#125;</div><div class="line">func &gt;(lhs: MyPoint, rhs: MyPoint) -&gt; Bool &#123;</div><div class="line">    return lhs.hashValue &gt; rhs.hashValue</div><div class="line">&#125;</div><div class="line">func &gt;=(lhs: MyPoint, rhs: MyPoint) -&gt; Bool &#123;</div><div class="line">    return lhs.hashValue &gt;= rhs.hashValue</div><div class="line">&#125;</div><div class="line"></div><div class="line">pointA &gt;= pointB //true</div><div class="line">pointA &gt; pointC //false</div><div class="line">pointA &lt; pointC //true</div></pre></td></tr></table></figure></p>
-<p>借用 Mattt的话来做下总结:</p>
-<blockquote>
-<p>在 Swift 中，Equatable 是一个基本类型，由此也演变出了 Comparable 和 Hashable 两种类型。这三个一起组成了这门语言关于对象比较的核心元素。</p>
-</blockquote>
-<p>##再看看Sequence (这部分 Swift3有变化)</p>
-<p>####SequenceType(Swift 2.x) -&gt; Sequence (Swift 3.0)<br>SequenceType在喵神的 Swifttips 里面已经讲解的很好了,我还是把自己的例子写了下来.这部分代码是 Swift3版本下的.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public protocol SequenceType &#123;</div><div class="line">   associatedtype Iterator : IteratorProtocol</div><div class="line">    //在3.0以前是GeneratorType</div><div class="line">    ........</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>IteratorProtocol又是什么呢?其实GeneratorType一样,可以理解为生成器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public protocol IteratorProtocol &#123;</div><div class="line">    associatedtype Element</div><div class="line">    public mutating func next() -&gt; Self.Element?</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>associatedtype Element要求实现这个协议的类必须定义一个名为Element的别名，这样一定程度上实现了泛型协议。协议同时要求实现next函数，其返回值是别名中定义的Element类型，next函数代表生成器要生成的下一个元素。<br>sample 是来自<a href="http://swiftcafe.io/2015/11/21/sequence/" target="_blank" rel="external">链接</a>,写的非常清楚,我这只是贴贴我的 playground<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">struct Book &#123;</div><div class="line">    var name: String = &quot;&quot;</div><div class="line">    var price: Float = 0.0</div><div class="line">    init(name: String, price: Float) &#123;</div><div class="line">        self.name = name</div><div class="line">        self.price = price</div><div class="line">    &#125;</div><div class="line">&#125;//定义一个 Book 的 Struct, 有书名和价格</div><div class="line"></div><div class="line">class BookListIterator: IteratorProtocol &#123;</div><div class="line">    typealias Element = Book //将 Book 类赋值 Element</div><div class="line"></div><div class="line">    var currentIndex: Int = 0</div><div class="line">    var bookList: [Book]?</div><div class="line"></div><div class="line">    init(bookList: [Book]) &#123;</div><div class="line">        self.bookList = bookList</div><div class="line">    &#125; //初始化方法</div><div class="line"></div><div class="line">//用来遍历 bookList,直到返回 nil</div><div class="line">    func next() -&gt; BookListIterator.Element? &#123;</div><div class="line">        guard let list = bookList else &#123; return nil &#125;</div><div class="line"></div><div class="line">        if currentIndex &lt; list.count &#123;</div><div class="line">            let element = list[currentIndex]</div><div class="line">            currentIndex += 1</div><div class="line">            return element</div><div class="line">        &#125; else &#123;</div><div class="line">            return nil</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>现在IteratorProtocol这个生成器已经写好了,可以写 Sequence了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class BookList: Sequence &#123;</div><div class="line"></div><div class="line">    var bookList: [Book]?</div><div class="line"></div><div class="line">    init() &#123;</div><div class="line">        self.bookList = [Book]()</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    func addBook(book: Book) &#123;</div><div class="line">        self.bookList?.append(book)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">// associatedtype Iterator : IteratorProtocol</div><div class="line">    typealias Iterator = BookListIterator</div><div class="line">    </div><div class="line">//public func makeIterator() -&gt; Self.Iterator</div><div class="line">   func makeIterator() -&gt; BookList.Iterator &#123;</div><div class="line">        return BookListIterator(bookList: self.bookList!)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>来试试写的 BookList:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">let bookList = BookList()</div><div class="line"></div><div class="line">bookList.addBook(book: Book(name: &quot;Swift&quot;, price: 12.5))</div><div class="line">bookList.addBook(book: Book(name: &quot;iOS&quot; , price: 10.5))</div><div class="line">bookList.addBook(book: Book(name: &quot;Objc&quot;, price: 20.0))</div><div class="line"></div><div class="line">for book in bookList &#123;</div><div class="line">    print(&quot;\(book.name) 价格 ￥\(book.price)&quot;)</div><div class="line">&#125;</div><div class="line">// Swift 价格 ￥12.5 </div><div class="line">// iOS 价格 ￥10.5</div><div class="line">// Objc 价格 ￥20.0</div></pre></td></tr></table></figure></p>
-<p>而且不止可以使用 for…in, 还可以用 map , filter 和 reduce.<br>再谈谈 Swift3的变化,其实就是变了GeneratorType To IteratorProtocol,就是这么任性….</p>
-<h2 id="从-Sequence-到-Collection"><a href="#从-Sequence-到-Collection" class="headerlink" title="从 Sequence 到 Collection"></a>从 Sequence 到 Collection</h2><p>####SequenceType(Swift 2.x) -&gt; Sequence (Swift 3.0)<br>如果现在我们要看 bookList的 count, 就牵扯到了Collection这个协议,可以发现这个协议是对Indexable 和 Sequence 的扩展.</p>
-<p>####重点看看这个Indexable<br>在2.x的时候,Indexable 并没有继承任何其他协议,那么3.0来了,来了个IndexableBase:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public protocol Indexable : IndexableBase</div></pre></td></tr></table></figure></p>
-<p>那再来看IndexableBase:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//2.x版本indexable</div><div class="line">var endIndex: Self.Index </div><div class="line">var startIndex: Self.Index </div><div class="line">subscript(_: Self.Index) </div><div class="line"></div><div class="line">//新增的下标以及实例方法</div><div class="line">subscript(_: Range&lt;Self.Index&gt;) </div><div class="line">func formIndex(after:) </div><div class="line">func index(after:)</div></pre></td></tr></table></figure></p>
-<p>再回到 Collection, 如果我们的类型已经遵循了Sequence,那么就只需要遵循:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var startIndex: Int</div><div class="line">var endIndex: Int</div><div class="line">subscript(_: Self.Index) </div><div class="line">func index(after:)</div></pre></td></tr></table></figure></p>
-<p> 这四个需求中,startIndex和endIndex是为了 Collection 中要遵循 Indexable协议,还得实现一个下标索引来获取对应索引元素.在 Swift3中,还需要声明 index(after:),关于这个戳<a href="https://github.com/apple/swift-evolution/blob/master/proposals/0065-collections-move-indices.md" target="_blank" rel="external">swift-evolutionl链接</a>.<br>再看看怎么对 Sample 例子中BookList遵循 Collection<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">extension BookList: Collection &#123;</div><div class="line"></div><div class="line">    typealias Element = Book</div><div class="line"></div><div class="line">    var startIndex: Int &#123;</div><div class="line">        return 0</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    var endIndex: Int &#123;</div><div class="line">        return bookList!.count</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    subscript(i: Int) -&gt; Element &#123;</div><div class="line">        precondition((0..&lt;endIndex).contains(i), &quot;index out of bounds&quot;)</div><div class="line">        return bookList![i]</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    func index(after i: Int) -&gt; Int &#123;</div><div class="line">        if i &lt; endIndex &#123;</div><div class="line">            return i + 1</div><div class="line">        &#125; else &#123;</div><div class="line">            return endIndex</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>是几个属性方法的实现还是挺简单的,现在BookList 这个 class,既遵循了 Sequence 和 Collection, 就有超过40种方法和属性可以使用:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">booklist.first //(Book(name: &quot;Swift&quot;, price: 12.5))</div><div class="line">booklist.count // 3</div><div class="line">booklist.endIndex // 3</div><div class="line">booklist.isEmpty //false</div></pre></td></tr></table></figure></p>
-<p>现在自己创建的类型就已经遵循了 Sequence和 Collection,还有map,reduce 等函数式方法可以使用.</p>
-
           
+本文主要是从 Hashable作为入口,了解Swift3的标准库协议.再研究从自定义的类去遵循 Sequence和 Collection 两大基础协议,从而加深Swift的面向协议编程的思想
+
+入坑 Swift的时候看了一段演讲,这是链接.这让我对Swift的面向协议编程有了兴趣.
+Swift中，
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/10/09/从Swift3的标准库协议看面向协议编程(一)/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1646,7 +1502,7 @@
 <div class="theme-info">
   主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Muse
+    NexT.Pisces
   </a>
 </div>
 
@@ -1713,6 +1569,13 @@
 
   
   
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
 
   
 
