@@ -1,0 +1,734 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="React-Native," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="RN 的 Flexbox 布局的学习笔记
+
+
+1.什么是 Flexbox 布局?Flexbox,弹性布局,可以以响应式的方式实现各种页面布局,具有很大的灵活性.属于web 前端 CSS 的一种布局方案.React中也使用了这种布局.
+2.基础概念采用Flex布局的元素，称为Flex容器（flex container），简称”容器”。它的所有子元素自动成为容器成员，称为Flex项目（flex it">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RN 的 Flexbox 布局的学习笔记">
+<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/28/2017-07-28React-Native中的Flexbox布局/index.html">
+<meta property="og:site_name" content="石不帅_Code">
+<meta property="og:description" content="RN 的 Flexbox 布局的学习笔记
+
+
+1.什么是 Flexbox 布局?Flexbox,弹性布局,可以以响应式的方式实现各种页面布局,具有很大的灵活性.属于web 前端 CSS 的一种布局方案.React中也使用了这种布局.
+2.基础概念采用Flex布局的元素，称为Flex容器（flex container），简称”容器”。它的所有子元素自动成为容器成员，称为Flex项目（flex it">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-e751938a9f377bc4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-150467a258c52e19.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-51a262712d37437b.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-219b5fb68e1cc8f9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-840d6ba2e2b8bb9a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-cca6c7386c6068ad.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-c0f45597cff65d7f.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-9888c92927816a0f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320">
+<meta property="og:updated_time" content="2017-08-03T03:16:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RN 的 Flexbox 布局的学习笔记">
+<meta name="twitter:description" content="RN 的 Flexbox 布局的学习笔记
+
+
+1.什么是 Flexbox 布局?Flexbox,弹性布局,可以以响应式的方式实现各种页面布局,具有很大的灵活性.属于web 前端 CSS 的一种布局方案.React中也使用了这种布局.
+2.基础概念采用Flex布局的元素，称为Flex容器（flex container），简称”容器”。它的所有子元素自动成为容器成员，称为Flex项目（flex it">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1240939-e751938a9f377bc4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/28/2017-07-28React-Native中的Flexbox布局/"/>
+
+
+
+
+
+  <title> RN 的 Flexbox 布局的学习笔记 | 石不帅_Code </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">石不帅_Code</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">iOS开发者 Swift爱好者 处女座</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/28/2017-07-28React-Native中的Flexbox布局/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="石不帅_">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="石不帅_Code">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="石不帅_Code" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RN 的 Flexbox 布局的学习笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-28T21:18:06+08:00">
+                2017-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>RN 的 Flexbox 布局的学习笔记</p>
+</blockquote>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-e751938a9f377bc4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Flexbox"></p>
+<h3 id="1-什么是-Flexbox-布局"><a href="#1-什么是-Flexbox-布局" class="headerlink" title="1.什么是 Flexbox 布局?"></a>1.什么是 Flexbox 布局?</h3><p>Flexbox,弹性布局,可以以响应式的方式实现各种页面布局,具有很大的灵活性.属于web 前端 CSS 的一种布局方案.React中也使用了这种布局.</p>
+<h3 id="2-基础概念"><a href="#2-基础概念" class="headerlink" title="2.基础概念"></a>2.基础概念</h3><p>采用Flex布局的元素，称为Flex容器（flex container），简称”容器”。它的所有子元素自动成为容器成员，称为Flex项目（flex item），简称”项目”。<br>容器中有两根坐标轴:水平的主轴(main axis) 垂直的交叉轴(cross axis).<br>主轴的开始位置（与边框的交叉点）叫做main start，结束位置叫做main end；交叉轴的开始位置叫做cross start，结束位置叫做cross end。项目默认沿主轴排列。单个项目占据的主轴空间叫做main size，占据的交叉轴空间叫做cross size。<br><img src="http://upload-images.jianshu.io/upload_images/1240939-150467a258c52e19.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="来自阮一峰 flex布局"></p>
+<h3 id="3-基础属性"><a href="#3-基础属性" class="headerlink" title="3.基础属性"></a>3.基础属性</h3><ul>
+<li>flex-direction: 容器的主轴方向,默认是 row. 该值是表示 items 的排列方向布局,默认是从左到右,从上到下.</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-51a262712d37437b.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="660d0cdfjw1etlhxise4kj218g0xc0vf.jpg"></p>
+<ul>
+<li><p>flex-wrap: 当主轴宽度的不够的时候,是否换行,怎么换行.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-219b5fb68e1cc8f9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="660d0cdfjw1etlhxjtkfwj218g0xcwhp.jpg"></p>
+</li>
+<li><p>justify-content: 主轴上项目的对齐方式.</p>
+</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-840d6ba2e2b8bb9a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="660d0cdfjw1etlhxjven9j218g0xcgp4.jpg"></p>
+<ul>
+<li>align-items: cross axis 上项目中子元素的对齐方式.若子元素本来是沿着竖直方向排列的（即主轴竖直，次轴水平），则alignItems决定了它们在水平方向的排列方式.<br>align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-cca6c7386c6068ad.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="660d0cdfjw1etlhxkrusyj218g0xcwhn.jpg"></p>
+<ul>
+<li>align-content: 侧轴上可以换行时,侧轴对齐方式.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-c0f45597cff65d7f.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="660d0cdfjw1etlhxl3605j218g0xcwip.jpg"></li>
+</ul>
+<h3 id="4-Demo"><a href="#4-Demo" class="headerlink" title="4.Demo"></a>4.Demo</h3><p>先放上效果图:</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-9888c92927816a0f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320" alt="Simulator Screen Shot"></p>
+<p>底部有三个View,flex 分别对应1,2,3.<br>头部 View的高度就是ScreenHeight <em>  1 / (1 + 2 + 3)<br>中部 View的高度就是ScreenHeight </em>  2 / (1 + 2 + 3)<br>底部 View的高度就是ScreenHeight *  3 / (1 + 2 + 3)</p>
+<p>再看头部 View 中 Item 的布局:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123;styles.topView&#125;&gt;</div><div class="line">      &lt;View style=&#123;styles.topViewItem&#125;/&gt;</div><div class="line">      &lt;View style=&#123;styles.topViewItem1&#125;/&gt;</div><div class="line">      &lt;View style=&#123;styles.topViewItem2&#125;/&gt;</div><div class="line">&lt;/View&gt;</div></pre></td></tr></table></figure></p>
+<p>StyleSheet 中的布局是:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">topView: &#123;</div><div class="line">  flex: 1,</div><div class="line">  justifyContent: &apos;space-around&apos;,</div><div class="line">  alignItems: &apos;flex-start&apos;,</div><div class="line">  backgroundColor: &apos;#FD5056&apos;,</div><div class="line">  flexDirection: &apos;row&apos;,</div><div class="line">  paddingLeft: 10,</div><div class="line">  paddingRight: 10,</div><div class="line">&#125;,</div><div class="line">topViewItem: &#123;</div><div class="line">  width: 60,  // 这里可以指定宽高,也可以设置 flex 去自适应</div><div class="line">  height: 60,</div><div class="line">  backgroundColor: &apos;yellow&apos;,</div><div class="line">&#125;,</div><div class="line">topViewItem1: &#123;</div><div class="line">  width: 60,</div><div class="line">  height: 80,</div><div class="line">  backgroundColor: &apos;blue&apos;,</div><div class="line">&#125;,</div><div class="line">topViewItem2: &#123;</div><div class="line">  width: 60,</div><div class="line">  height: 100,</div><div class="line">  backgroundColor: &apos;black&apos;,</div><div class="line">&#125;,</div></pre></td></tr></table></figure></p>
+<p> <a href="https://github.com/sfmDev/React-Native-Pratice" target="_blank" rel="external">Demo 地址</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://weibo.com/1712131295/CoRnElNkZ?ref=collection&amp;type=comment&amp;sudaref=reactnative.cn&amp;retcode=6102#_rnd1501387934006" target="_blank" rel="external">Flexbox口诀</a><br><a href="http://reactnative.cn/docs/0.46/layout-props.html" target="_blank" rel="external">http://reactnative.cn/docs/0.46/layout-props.html</a><br><a href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/React-Native/" rel="tag"># React-Native</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/15/2017-07-15 Rx中的那些操作符/" rel="next" title="Rx中的那些操作符">
+                <i class="fa fa-chevron-left"></i> Rx中的那些操作符
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500"
+               alt="石不帅_" />
+          <p class="site-author-name" itemprop="name">石不帅_</p>
+          <p class="site-description motion-element" itemprop="description">iOS开发者 Swift爱好者 处女座</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-什么是-Flexbox-布局"><span class="nav-number">1.</span> <span class="nav-text">1.什么是 Flexbox 布局?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-基础概念"><span class="nav-number">2.</span> <span class="nav-text">2.基础概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-基础属性"><span class="nav-number">3.</span> <span class="nav-text">3.基础属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Demo"><span class="nav-number">4.</span> <span class="nav-text">4.Demo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">石不帅_</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
