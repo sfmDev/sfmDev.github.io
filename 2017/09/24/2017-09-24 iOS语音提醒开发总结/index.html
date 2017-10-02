@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Swift,RxSwift," />
+  <meta name="keywords" content="iOS," />
 
 
 
@@ -84,52 +84,38 @@
 
 
 
-<meta name="description" content="[TOC]
+<meta name="description" content="10.2 更新
+开源了!以下优化用于饿了么蜂鸟App中,项目链接在链接 ,欢迎 star 和 pr.
 
-记录学习 Rx 过程中的各种操作符以ß及用法还有 tips 等等.所有弹珠图均来自 RxMarbles App.
+语音播放一直是一个较低频的开发知识点,很多开发并没有这样的需求,所以导致在墙内搜不到太多关于它的一些总结(主要是踩坑),刚好最近接了一个语音优化的需求,将自己的经验与总结记录下来.
 
-Filtering Opertators
-ignoreElements: 忽略. next 事件.会接受到结束事件(.completed, .error).
-
-filter: filter 接受一个作用于每个事件的predicate closure,当 predicat">
+首先要介绍微信团队总结的一篇,给出了很多解决方案https://mp.weixin.qq.com/s/yYCaP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Rx中的那些操作符">
-<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/15/2017-07-15 Rx中的那些操作符/index.html">
+<meta property="og:title" content="iOS语音提醒开发总结">
+<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/09/24/2017-09-24 iOS语音提醒开发总结/index.html">
 <meta property="og:site_name" content="石不帅_Code">
-<meta property="og:description" content="[TOC]
+<meta property="og:description" content="10.2 更新
+开源了!以下优化用于饿了么蜂鸟App中,项目链接在链接 ,欢迎 star 和 pr.
 
-记录学习 Rx 过程中的各种操作符以ß及用法还有 tips 等等.所有弹珠图均来自 RxMarbles App.
+语音播放一直是一个较低频的开发知识点,很多开发并没有这样的需求,所以导致在墙内搜不到太多关于它的一些总结(主要是踩坑),刚好最近接了一个语音优化的需求,将自己的经验与总结记录下来.
 
-Filtering Opertators
-ignoreElements: 忽略. next 事件.会接受到结束事件(.completed, .error).
-
-filter: filter 接受一个作用于每个事件的predicate closure,当 predicat">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-aeb65640bf715d5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-a726d5589ab1c12e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-bde1245820441f02.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-a454bd8f2ec23ea0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-68814e9a17debeab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-617e63ca9d9c75e0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-e78adbd69913bfc3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-403175c62f6b5480.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-c77f81b0f3f1d68a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-2d0c1f086b99aa8c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-a19caa649e9dc3a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-087a3829b1589aab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-a9452071adede48d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-49bc9a9583e5d952.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
-<meta property="og:updated_time" content="2017-08-03T03:16:54.000Z">
+首先要介绍微信团队总结的一篇,给出了很多解决方案https://mp.weixin.qq.com/s/yYCaP">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-08e54a205d1f419a?imageMogr2/auto-orient/strip%7CimageView2/2/w/520">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-d0ad4d9ec27a802c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/640">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-faca31d8e10a6885.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-17c1bcc4c0c7013b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-79a4a3f46842d31e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1240939-a8c8fd6de5f2d276.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320">
+<meta property="og:updated_time" content="2017-10-02T13:43:27.170Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Rx中的那些操作符">
-<meta name="twitter:description" content="[TOC]
+<meta name="twitter:title" content="iOS语音提醒开发总结">
+<meta name="twitter:description" content="10.2 更新
+开源了!以下优化用于饿了么蜂鸟App中,项目链接在链接 ,欢迎 star 和 pr.
 
-记录学习 Rx 过程中的各种操作符以ß及用法还有 tips 等等.所有弹珠图均来自 RxMarbles App.
+语音播放一直是一个较低频的开发知识点,很多开发并没有这样的需求,所以导致在墙内搜不到太多关于它的一些总结(主要是踩坑),刚好最近接了一个语音优化的需求,将自己的经验与总结记录下来.
 
-Filtering Opertators
-ignoreElements: 忽略. next 事件.会接受到结束事件(.completed, .error).
-
-filter: filter 接受一个作用于每个事件的predicate closure,当 predicat">
-<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1240939-aeb65640bf715d5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350">
+首先要介绍微信团队总结的一篇,给出了很多解决方案https://mp.weixin.qq.com/s/yYCaP">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1240939-08e54a205d1f419a?imageMogr2/auto-orient/strip%7CimageView2/2/w/520">
 
 
 
@@ -157,13 +143,13 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
 
 
 
-  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/15/2017-07-15 Rx中的那些操作符/"/>
+  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/09/24/2017-09-24 iOS语音提醒开发总结/"/>
 
 
 
 
 
-  <title> Rx中的那些操作符 | 石不帅_Code </title>
+  <title> iOS语音提醒开发总结 | 石不帅_Code </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -286,7 +272,7 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/07/15/2017-07-15 Rx中的那些操作符/">
+  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2017/09/24/2017-09-24 iOS语音提醒开发总结/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="石不帅_">
@@ -310,7 +296,7 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
             
             
               
-                Rx中的那些操作符
+                iOS语音提醒开发总结
               
             
           </h1>
@@ -325,8 +311,8 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-15T23:54:16+08:00">
-                2017-07-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-24T23:22:05+08:00">
+                2017-09-24
               </time>
             
 
@@ -383,52 +369,33 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
       
 
       
-        <p>[TOC]</p>
-<blockquote>
-<p>记录学习 Rx 过程中的各种操作符以ß及用法还有 tips 等等.<br>所有弹珠图均来自 RxMarbles App.</p>
+        <h3 id="10-2-更新"><a href="#10-2-更新" class="headerlink" title="10.2 更新"></a>10.2 更新</h3><blockquote>
+<p>开源了!以下优化用于饿了么蜂鸟App中,项目链接在<a href="https://github.com/LPD-iOS/LPDSoundServiceKit" target="_blank" rel="external">链接</a> ,欢迎 star 和 pr.</p>
 </blockquote>
-<h3 id="Filtering-Opertators"><a href="#Filtering-Opertators" class="headerlink" title="Filtering Opertators"></a>Filtering Opertators</h3><ul>
-<li><p>ignoreElements: 忽略. next 事件.会接受到结束事件(.completed, .error).<br><img src="http://upload-images.jianshu.io/upload_images/1240939-aeb65640bf715d5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="ignoreElements.png"></p>
-</li>
-<li><p>filter: filter 接受一个作用于每个事件的predicate closure,当 predicate 结果为 true时通过.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-a726d5589ab1c12e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="filter.png"></p>
-</li>
+<p>语音播放一直是一个较低频的开发知识点,很多开发并没有这样的需求,所以导致在墙内搜不到太多关于它的一些总结(主要是踩坑),刚好最近接了一个语音优化的需求,将自己的经验与总结记录下来.</p>
+<blockquote>
+<p>首先要介绍微信团队总结的一篇,给出了很多解决方案<br><a href="微信iOS收款到账语音提醒开发总结">https://mp.weixin.qq.com/s/yYCaPMxHGT9LyRyAPewVWQ</a></p>
+</blockquote>
+<h3 id="先列出待优化的点"><a href="#先列出待优化的点" class="headerlink" title="先列出待优化的点"></a>先列出待优化的点</h3><ul>
+<li>在后台播放音乐时,语音提醒之后音乐不会恢复播放.</li>
+<li>插耳机和扬声器播放声音忽大忽小</li>
+<li>在接听电话时,会有语音播放,影响通话</li>
+<li>有时候播放语音有震动,有时候没有</li>
 </ul>
-<h3 id="Skipping-Opertators"><a href="#Skipping-Opertators" class="headerlink" title="Skipping Opertators"></a>Skipping Opertators</h3><ul>
-<li><p>skip: skip 操作符允许忽略从第一个到输入的number个事件.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-bde1245820441f02.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="skip.png"></p>
-</li>
-<li><p>skipWhile 与 skipUntil:<br>这两个都是带条件的 skip 操作符,skipWhile 接受一个断言来判断 Skip 哪一个;<br><img src="http://upload-images.jianshu.io/upload_images/1240939-a454bd8f2ec23ea0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="skipWhile.png"><br>而 skipUntil不是接受一个静态条件,而且是接受另一个 observable, 它会 skip source Observable 的事件直到收到 trigger Observable 的事件.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-68814e9a17debeab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="skipUntil.png"></p>
-</li>
-</ul>
-<h3 id="Taking-Opertators"><a href="#Taking-Opertators" class="headerlink" title="Taking Opertators"></a>Taking Opertators</h3><p>taking 是 skip 的对立面,这样就很好理解了. 直接放弹珠图.</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-617e63ca9d9c75e0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="take.png"></p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-e78adbd69913bfc3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="takeWhile.png"></p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-403175c62f6b5480.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="takeUntil.png"></p>
-<h3 id="Transforming-Opertators"><a href="#Transforming-Opertators" class="headerlink" title="Transforming Opertators"></a>Transforming Opertators</h3><ul>
-<li><p>map: 跟 Swift的map 类似,接受一个闭包然后对每个事件做处理.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-c77f81b0f3f1d68a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="map.png"></p>
-</li>
-<li><p>flatMap: 最开始理解 Swift 的 map和 flatMap 就比较费劲,后来知道 flatMap 的核心就就是:  <code>降维</code><br>先看看 flatMap的定义</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public func flatMap&lt;O: ObservableConvertibleType&gt;(selector: (E) throws -&gt; O) -&gt; Observable&lt;O.E&gt; &#123;</div><div class="line">    return FlatMap(source: asObservable(), selector: selector)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>在 Rx 中，flatMap可以把一个序列转换成一组序列，然后再把这一组序列<code>拍扁</code>成一个序列。<code>拍扁</code> 其实就是<code>降维</code>的意思.</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-2d0c1f086b99aa8c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="flatMap.png"></p>
-<h3 id="Combining-Opertators"><a href="#Combining-Opertators" class="headerlink" title="Combining Opertators"></a>Combining Opertators</h3><ul>
-<li>CombineLatest: combineLatest 操作符用闭包接受每个队列最新的值,然后最新的值合并成一个新值发送出去.</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-a19caa649e9dc3a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="CombineLatest.png"></p>
-<ul>
-<li>Concat: concat 操作符可以把多个队列合并起来,合并是顺序是按照队列添加的顺序</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-087a3829b1589aab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="Concat.png"></p>
-<ul>
-<li>Merge: merge操作符也是把对个队列合并,但与 concat 不同的是它是按照队列发出事件的时间来合并.</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-a9452071adede48d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="Merge.png"></p>
-<ul>
-<li>StartWith: startWith 操作符给一个队列给定了一个初始值,这个值的类型必须和队列里面的元素类型相同.</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/1240939-49bc9a9583e5d952.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/350" alt="StartWith.png"></p>
-<h4 id="to-be-continued"><a href="#to-be-continued" class="headerlink" title="to be continued"></a>to be continued</h4>
+<h3 id="优化1"><a href="#优化1" class="headerlink" title="优化1"></a>优化1</h3><p>当有提示音播放时,后台音乐被中断且无法自动恢复.<br>这个问题首先想到AVAudioSession 中 category 的设置问题,可以根据下图结合 app 的实际需求去选择合适的一个.<br><img src="http://upload-images.jianshu.io/upload_images/1240939-08e54a205d1f419a?imageMogr2/auto-orient/strip%7CimageView2/2/w/520" alt="AVAudioSession 的类型"><br>设置完成之后要注意是否在播放完成的代理方法中执行了:</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-d0ad4d9ec27a802c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/640" alt="function.png"></p>
+<p>这里还要注意一点,AVAudioSession在设置 category 的时候支持传入 options,来对设置的 category 来微调.参看<code>LPDSoundService</code>.</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-faca31d8e10a6885.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="category.png"></p>
+<h3 id="优化2"><a href="#优化2" class="headerlink" title="优化2"></a>优化2</h3><p>插耳机和扬声器播放声音音量不稳定这个问题,首先去定位播放的声音文件,发现声音文件确实存在几个声音高低的问题.<br>接下来再去找发现在耳机插入时存在短暂的声音丢失,那我的优化办法是在监听耳机的状态的方法里暂停播放0.1s.耳机的插入拔出会触发这个通知<code>AVAudioSessionRouteChangeNotification</code></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-17c1bcc4c0c7013b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="function.png"><br>接下来对音量处理参考微信的解决办法,用<code>MPVolumeView</code>中的 slider 来处理音量的控制,但是把<code>MPVolumeView</code>加到了<code>keyWindow</code>上,参看<code>LPDVolumeManager</code>这个音量控制的单例类.</p>
+<h3 id="优化3"><a href="#优化3" class="headerlink" title="优化3"></a>优化3</h3><p>在接电话的时候还有语音播放这个问题找了好久的解决办法,后来发现自己犯傻了…<br>首先肯定是要在播放语音之前判断当前时候是否处在通话状态,轻松搜到CTCallCenter类,但是发现这个不起作用,那就去私有库找找API(不上商店就是好),后来兜兜转转发现这个CTCallCenter是 iOS9以下,在10之后换成了CXCallObserver类,贴代码,参看<code>LPDTeleponyManager</code>.</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-79a4a3f46842d31e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="function.png"></p>
+<h3 id="优化4"><a href="#优化4" class="headerlink" title="优化4"></a>优化4</h3><p>有时候播放语音有震动,有时候没有….<br>这个问题真是奇葩了,产品逻辑要求播放声音的时候要求有震动,这简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);</div></pre></td></tr></table></figure></p>
+<p>但是突然发现,有时候震动就突然没了,调试发现方法也走了,最后无奈发现苹果然后还有一手,</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1240939-a8c8fd6de5f2d276.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320" alt="image.png"><br>不开这一项,怎么震动…</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在做整个优化的过程中踩了不少坑也花了不少时间,在调用 API 的时候最好自己看看上面的注释,尤其是不熟悉的 API,能看官方文档就看官方的.</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/ConfiguringanAudioSession/ConfiguringanAudioSession.html#//apple_ref/doc/uid/TP40007875-CH2-SW1" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/ConfiguringanAudioSession/ConfiguringanAudioSession.html#//apple_ref/doc/uid/TP40007875-CH2-SW1</a></p>
+
       
     </div>
 
@@ -451,9 +418,7 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
       
         <div class="post-tags">
           
-            <a href="/tags/Swift/" rel="tag"># Swift</a>
-          
-            <a href="/tags/RxSwift/" rel="tag"># RxSwift</a>
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
           
         </div>
       
@@ -462,8 +427,8 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/06/15/2017-06-15RxSwift(伪)实战-组内分享/" rel="next" title="RxSwift(伪)实战-组内分享">
-                <i class="fa fa-chevron-left"></i> RxSwift(伪)实战-组内分享
+              <a href="/2017/09/11/2017-09-11 iBeacon详细介绍以及坑点 /" rel="next" title="iBeacon详细介绍以及坑点">
+                <i class="fa fa-chevron-left"></i> iBeacon详细介绍以及坑点
               </a>
             
           </div>
@@ -471,10 +436,6 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/07/28/2017-07-28React-Native中的Flexbox布局/" rel="prev" title="RN 的 Flexbox 布局的学习笔记">
-                RN 的 Flexbox 布局的学习笔记 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -597,7 +558,7 @@ filter: filter 接受一个作用于每个事件的predicate closure,当 predica
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Filtering-Opertators"><span class="nav-number">1.</span> <span class="nav-text">Filtering Opertators</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Skipping-Opertators"><span class="nav-number">2.</span> <span class="nav-text">Skipping Opertators</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Taking-Opertators"><span class="nav-number">3.</span> <span class="nav-text">Taking Opertators</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transforming-Opertators"><span class="nav-number">4.</span> <span class="nav-text">Transforming Opertators</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Combining-Opertators"><span class="nav-number">5.</span> <span class="nav-text">Combining Opertators</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#to-be-continued"><span class="nav-number">5.1.</span> <span class="nav-text">to be continued</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#10-2-更新"><span class="nav-number">1.</span> <span class="nav-text">10.2 更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#先列出待优化的点"><span class="nav-number">2.</span> <span class="nav-text">先列出待优化的点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化1"><span class="nav-number">3.</span> <span class="nav-text">优化1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化2"><span class="nav-number">4.</span> <span class="nav-text">优化2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化3"><span class="nav-number">5.</span> <span class="nav-text">优化3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化4"><span class="nav-number">6.</span> <span class="nav-text">优化4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
