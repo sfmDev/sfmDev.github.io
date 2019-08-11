@@ -1,0 +1,768 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="什么是 MachO?mach-o(Mach Object File Format)是 Mac 和 iOS 平台上可执行文件的格式,类似于 windows 平台上的exe.常见MachO格式的文件:
+
+.o
+.a .dylib .framework
+二进制可执行文件
+.dsym加载与执行首先了解下什么是进程,进程是一个程序的执行实体.那 App 的启动就可以分为两步:
+内核创建一个进程,分配空间,加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MachO 详解到使用">
+<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/11/MachO-详解到使用/index.html">
+<meta property="og:site_name" content="石不帅_Code">
+<meta property="og:description" content="什么是 MachO?mach-o(Mach Object File Format)是 Mac 和 iOS 平台上可执行文件的格式,类似于 windows 平台上的exe.常见MachO格式的文件:
+
+.o
+.a .dylib .framework
+二进制可执行文件
+.dsym加载与执行首先了解下什么是进程,进程是一个程序的执行实体.那 App 的启动就可以分为两步:
+内核创建一个进程,分配空间,加">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fca89f34b2e7?w=320&h=362&f=png&s=67394">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcaf756dc9fa?w=708&h=355&f=jpeg&s=99707">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcb4ccdfcfc6?w=371&h=698&f=jpeg&s=115021">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcb94ba29a41?w=1478&h=814&f=jpeg&s=350050">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcbca9cff3d8?w=1000&h=195&f=jpeg&s=83231">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcbf3bd3d2ca?w=1320&h=578&f=jpeg&s=238758">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcc13d2f0169?w=644&h=394&f=jpeg&s=86254">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcc2df05eaa8?w=632&h=740&f=jpeg&s=166009">
+<meta property="og:updated_time" content="2019-08-11T08:43:54.834Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MachO 详解到使用">
+<meta name="twitter:description" content="什么是 MachO?mach-o(Mach Object File Format)是 Mac 和 iOS 平台上可执行文件的格式,类似于 windows 平台上的exe.常见MachO格式的文件:
+
+.o
+.a .dylib .framework
+二进制可执行文件
+.dsym加载与执行首先了解下什么是进程,进程是一个程序的执行实体.那 App 的启动就可以分为两步:
+内核创建一个进程,分配空间,加">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/8/11/16c7fca89f34b2e7?w=320&h=362&f=png&s=67394">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/11/MachO-详解到使用/"/>
+
+
+
+
+
+  <title> MachO 详解到使用 | 石不帅_Code </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">石不帅_Code</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">iOS开发者 Swift爱好者 处女座</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/11/MachO-详解到使用/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="石不帅_">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="石不帅_Code">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="石不帅_Code" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MachO 详解到使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-11T16:43:19+08:00">
+                2019-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="什么是-MachO"><a href="#什么是-MachO" class="headerlink" title="什么是 MachO?"></a>什么是 MachO?</h2><p>mach-o(Mach Object File Format)是 Mac 和 iOS 平台上可执行文件的格式,类似于 windows 平台上的exe.<br>常见MachO格式的文件:</p>
+<ul>
+<li>.o</li>
+<li>.a .dylib .framework</li>
+<li>二进制可执行文件</li>
+<li>.dsym<h2 id="加载与执行"><a href="#加载与执行" class="headerlink" title="加载与执行"></a>加载与执行</h2>首先了解下什么是进程,进程是一个程序的执行实体.<br>那 App 的启动就可以分为两步:</li>
+<li>内核创建一个进程,分配空间,加载 dyld</li>
+<li>dyld 加载根据mach-o的格式将可执行文件加载到内存.<br>之后系统通过<code>解析文件</code>、<code>建立依赖</code>、<code>初始化运行环境</code>、<code>执行进程</code>这几步来真正的运行App.<h2 id="MachO的结构"><a href="#MachO的结构" class="headerlink" title="MachO的结构"></a>MachO的结构</h2>结构图</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fca89f34b2e7?w=320&amp;h=362&amp;f=png&amp;s=67394" alt=""></p>
+<p>从图上可以看出 Mach-O 文件的结构,包括 Mach-O的头部,Load Command, Data.</p>
+<h3 id="Header"><a href="#Header" class="headerlink" title="Header"></a>Header</h3><p>Header: 在<mach-o loader.h="">中定义了 Header 的数据结构:</mach-o></p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcaf756dc9fa?w=708&amp;h=355&amp;f=jpeg&amp;s=99707" alt=""><br>上图代码是 64 位的 Header 数据结构,跟 32 位基本没有差别,mach_header_64多了一个额外的预留字段<code>uint32_t     reserved</code>. </p>
+<ul>
+<li>magic: 魔数, FAT文件(包含多个架构)为 <code>0xcafebabe</code>, armV7 是<code>0xfeedface</code>, arm64是<code>0xfeedfacf</code>.</li>
+<li>cputype: CPU 架构以及子版本</li>
+<li>filetype: 文件类型,常见的有MH_OBJECT(目标文件),MH_EXECUTABLE(二进制文件),MH_DYLIB(动态库)</li>
+<li>ncmds: 加载命名的数量</li>
+<li>sizeofcmds: 所有加载命名的大小</li>
+<li>flags: dyld 加载需要的一些标记</li>
+<li>reserved: 64位预留字段</li>
+</ul>
+<h3 id="LoadCommands"><a href="#LoadCommands" class="headerlink" title="LoadCommands"></a>LoadCommands</h3><p>用于告诉loader如何设置并加载二进制数据,对系统内核加载器和动态链接器(dyld)起指导作用.</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcb4ccdfcfc6?w=371&amp;h=698&amp;f=jpeg&amp;s=115021" alt=""><br>(通过 MachOView 查看得到)<br>列举几个常用的部分</p>
+<ul>
+<li>LC_SEGMENT_64: 定义一个Segment,加载后被映射到内存中,包括里面的节.</li>
+<li>LC_MAIN: 程序的入口, dyld获取该地址,然后跳转到该处执行;</li>
+<li>LC_LOAD_DYLIB: 依赖的动态库,包括动态库名称/当前版本号/兼容版本号;</li>
+</ul>
+<h3 id="Data-（数据段-segment）"><a href="#Data-（数据段-segment）" class="headerlink" title="Data （数据段 segment）"></a>Data （数据段 segment）</h3><p>存放数据：代码、字符常量、类、方法等, 可以拥有多个segment，每个segment可以有零到多个section。每个段都有一段虚拟地址映射到进程的地址空间.<br>先来看下数据结构, <code>LC_SEGMENT_64</code>定义了一个 64 位的 segment. 其定义如下:</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcb94ba29a41?w=1478&amp;h=814&amp;f=jpeg&amp;s=350050" alt=""><br>dyld 将 fileoff(基于当前架构的文件偏移量)处 fileSize 大小的内容加载到虚拟内存的 vmaddr处,其大小为 vmsize,segment 的权限由 initprot 进行初始化.<br><code>LC_SEGMENT_64</code>包括了一下 4 种:</p>
+<ul>
+<li>_PAGEZERO: 空指针陷阱段,用与捕捉对 iNULL指针的引用;</li>
+<li>_TEXT: 代码段/只读数据段;</li>
+<li>_DATA: 读取/写入数据的段;</li>
+<li>_LINKEDIT: dyld 需要的信息;</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcbca9cff3d8?w=1000&amp;h=195&amp;f=jpeg&amp;s=83231" alt=""><br>这里重点说下_TEXT字段,对于还要适配 iOS 8的 App, 可用的_TEXT段只有60M,这导致很多大团队对包大小异常敏感,也搞出来了很多trick的办法来解决.</p>
+<h3 id="Section"><a href="#Section" class="headerlink" title="Section"></a>Section</h3><p>在Segment 里面会包含不同的 section,其结构如下图:</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcbf3bd3d2ca?w=1320&amp;h=578&amp;f=jpeg&amp;s=238758" alt=""></p>
+<ul>
+<li>sectname: section 的名字</li>
+<li>segname: segment 的名字</li>
+<li>addr: 映射到虚拟地址的偏移</li>
+<li>size: section 的大小</li>
+<li>offset: section 在当前架构中的偏移</li>
+<li>align: section的字节对齐大小 n</li>
+<li>reloff: 重定位入口的文件偏移</li>
+<li>nreloc: 重定位入口的个数</li>
+<li>flags: section的类型与属性:</li>
+<li>reserved: 保留位</li>
+</ul>
+<p>__TEXT Segment的 Section:</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcc13d2f0169?w=644&amp;h=394&amp;f=jpeg&amp;s=86254" alt=""></p>
+<ul>
+<li>__text: 可执行文件的代码区域</li>
+<li>__objc_methname: 方法名</li>
+<li>__objc_classname: 类名</li>
+<li>__objc_methtype: 方法签名</li>
+<li><strong>cstring: 类C 风格的字符串.
+</strong>DATA Segment 的 Section:</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/11/16c7fcc2df05eaa8?w=632&amp;h=740&amp;f=jpeg&amp;s=166009" alt=""></p>
+<ul>
+<li>__nl_symbol_ptr: 非懒加载指针表,dyld 加载会立即绑定</li>
+<li>__ls_symbol_ptr: 懒加载指针表</li>
+<li>__mod_init_func: constructor 函数</li>
+<li>__mod_term_func: destructor 函数</li>
+<li>__objc_classlist: 类列表</li>
+<li>__objc_nlclslist: 实现了 load 方法的类</li>
+<li>__objc_protolist: protocol的列表</li>
+<li>__objc_classrefs: 被引用的类列表</li>
+<li>__objc _catlist: Category列表</li>
+</ul>
+<h3 id="Loader-Info-（链接信息）"><a href="#Loader-Info-（链接信息）" class="headerlink" title="Loader Info （链接信息）"></a>Loader Info （链接信息）</h3><p>一个完整的用户级MachO文件的末端是一系列链接信息。其中包含了动态加载器用来链接可执行文件或者依赖所需使用的符号表、字符串表等</p>
+<h2 id="能用来做什么-代码待开源"><a href="#能用来做什么-代码待开源" class="headerlink" title="能用来做什么? (代码待开源)"></a>能用来做什么? (代码待开源)</h2><ul>
+<li>Category的方法覆盖检查</li>
+<li>包瘦身,无用代码检查</li>
+<li>代码覆盖率静态检查</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>iOS应用逆向与安全</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/10/2018年度总结以及2019年年度计划/" rel="next" title="2018年度总结以及2019年年度计划">
+                <i class="fa fa-chevron-left"></i> 2018年度总结以及2019年年度计划
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500"
+               alt="石不帅_" />
+          <p class="site-author-name" itemprop="name">石不帅_</p>
+          <p class="site-description motion-element" itemprop="description">iOS开发者 Swift爱好者 处女座</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-MachO"><span class="nav-number">1.</span> <span class="nav-text">什么是 MachO?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加载与执行"><span class="nav-number">2.</span> <span class="nav-text">加载与执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MachO的结构"><span class="nav-number">3.</span> <span class="nav-text">MachO的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Header"><span class="nav-number">3.1.</span> <span class="nav-text">Header</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadCommands"><span class="nav-number">3.2.</span> <span class="nav-text">LoadCommands</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-（数据段-segment）"><span class="nav-number">3.3.</span> <span class="nav-text">Data （数据段 segment）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Section"><span class="nav-number">3.4.</span> <span class="nav-text">Section</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Loader-Info-（链接信息）"><span class="nav-number">3.5.</span> <span class="nav-text">Loader Info （链接信息）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#能用来做什么-代码待开源"><span class="nav-number">4.</span> <span class="nav-text">能用来做什么? (代码待开源)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">石不帅_</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
