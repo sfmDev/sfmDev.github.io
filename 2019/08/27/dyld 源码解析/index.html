@@ -1,0 +1,715 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="背景众所周知一个 iOS App 的程序入口是main.m, 但系统是怎么找到main.m的估计很多人就有疑问了,本文将详细解释这个问题.
+dylddyld(the dynamic link editor), 动态链接器,是专门用来加载动态库以及主程序的库.当kernel做好程序的启动准备工作之后,系统的执行由内核态转换为用户态,由 dyld 首先开始工作,iOS 中用到的所有系统framewor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dyld 源码解析">
+<meta property="og:url" content="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/27/dyld 源码解析/index.html">
+<meta property="og:site_name" content="石不帅_Code">
+<meta property="og:description" content="背景众所周知一个 iOS App 的程序入口是main.m, 但系统是怎么找到main.m的估计很多人就有疑问了,本文将详细解释这个问题.
+dylddyld(the dynamic link editor), 动态链接器,是专门用来加载动态库以及主程序的库.当kernel做好程序的启动准备工作之后,系统的执行由内核态转换为用户态,由 dyld 首先开始工作,iOS 中用到的所有系统framewor">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3ba9ae391a28?w=1142&h=738&f=jpeg&s=313950">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bb00bee32ab?w=1305&h=811&f=jpeg&s=207394">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3b9a2718690a?w=1118&h=830&f=jpeg&s=210730">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bb8cf92d3c9?w=1014&h=331&f=jpeg&s=112337">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bbadf3539d8?w=1098&h=486&f=jpeg&s=117553">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bc780ab0e95?w=934&h=254&f=jpeg&s=75432">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bcce583fe74">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bd30dade6fb?w=981&h=634&f=png&s=24712">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bd8c09017ff?w=1273&h=416&f=jpeg&s=169044">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bea8d46d2b9?w=895&h=139&f=jpeg&s=41335">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3be04b01aadb?w=1014&h=183&f=jpeg&s=55502">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bef72fd35a5?w=993&h=480&f=jpeg&s=158143">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bf1e9211961?w=1103&h=331&f=jpeg&s=102988">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bf5fa2f5063?w=986&h=298&f=jpeg&s=108741">
+<meta property="og:updated_time" content="2019-08-27T15:55:02.400Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dyld 源码解析">
+<meta name="twitter:description" content="背景众所周知一个 iOS App 的程序入口是main.m, 但系统是怎么找到main.m的估计很多人就有疑问了,本文将详细解释这个问题.
+dylddyld(the dynamic link editor), 动态链接器,是专门用来加载动态库以及主程序的库.当kernel做好程序的启动准备工作之后,系统的执行由内核态转换为用户态,由 dyld 首先开始工作,iOS 中用到的所有系统framewor">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/8/27/16cd3ba9ae391a28?w=1142&h=738&f=jpeg&s=313950">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/27/dyld 源码解析/"/>
+
+
+
+
+
+  <title> dyld 源码解析 | 石不帅_Code </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">石不帅_Code</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">iOS开发者 Swift爱好者 处女座</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://www.jianshu.com/users/baff671b8aed/latest_articles/2019/08/27/dyld 源码解析/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="石不帅_">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="石不帅_Code">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="石不帅_Code" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                dyld 源码解析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-27T23:53:19+08:00">
+                2019-08-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>众所周知一个 iOS App 的程序入口是<code>main.m</code>, 但系统是怎么找到<code>main.m</code>的估计很多人就有疑问了,本文将详细解释这个问题.</p>
+<h3 id="dyld"><a href="#dyld" class="headerlink" title="dyld"></a>dyld</h3><p>dyld(the dynamic link editor), 动态链接器,是专门用来加载动态库以及主程序的库.<br>当<code>kernel</code>做好程序的启动准备工作之后,系统的执行由内核态转换为用户态,由 dyld 首先开始工作,iOS 中用到的所有系统framework都是动态库,比如最常用的<code>UIKit.framework</code>,<code>Foundation.framework</code>, 而这些动态库是手机内所有App共享的,所以需要在我们 App运行前加载进来.<br>dyld 主要的工作有:</p>
+<ul>
+<li>初始化 App 运行环境</li>
+<li>链接依赖的动态库以及主程序</li>
+<li>rebase / binding</li>
+<li>返回 main.m 的函数地址<br>接下来分析下dyld 的源码.</li>
+</ul>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>在 demo 里加[NSObject init]的符号断点来看下:<br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3ba9ae391a28?w=1142&amp;h=738&amp;f=jpeg&amp;s=313950" alt=""><br>可以看到入口函数事在 <code>dyid_start</code>方法里的<code>dyldbootstrap::start</code>方法,接下来去源码里看看.<br>在 dyld 源码里找到<code>dyldStartup.s</code>找到了<code>__dyld_start</code>,这里只截取了arm架构的部分.<br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bb00bee32ab?w=1305&amp;h=811&amp;f=jpeg&amp;s=207394" alt=""><br>通过注释可以看到有调用<code>dyldbootstrap::start</code>,那顺着调用再往下看.<br>在<code>dyldInitialization.cpp</code>中找到了<code>start</code><br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3b9a2718690a?w=1118&amp;h=830&amp;f=jpeg&amp;s=210730" alt=""></p>
+<ul>
+<li>首先通过<code>slideOfMainExecutable</code>拿到随机地址的偏移量</li>
+<li>调用<code>rebaseDyld</code>重定位</li>
+<li>mach_init() mach消息初始化</li>
+<li><p><strong>guard_setup() 栈溢出保护<br>接下来调用了<code>dyld::_main</code>,将返回值传递给`</strong>dyld_start<code>的调用</code>main.m`函数.<br></p>
+<p><code>dyld::_main</code>是dyld中的关键方法,代码也非常多,它的实现可以分为以下几步: (关键部分有注释)</p>
+</li>
+<li>设置运行环境</li>
+<li>加载共享缓存</li>
+<li>加载主程序</li>
+<li>加载动态库</li>
+<li>链接主程序</li>
+<li>链接动态库</li>
+<li>初始化主程序</li>
+<li>返回入口地址<h4 id="0x01-设置运行环境"><a href="#0x01-设置运行环境" class="headerlink" title="0x01 设置运行环境"></a>0x01 设置运行环境</h4><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bb8cf92d3c9?w=1014&amp;h=331&amp;f=jpeg&amp;s=112337" alt=""><br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bbadf3539d8?w=1098&amp;h=486&amp;f=jpeg&amp;s=117553" alt=""><h4 id="0x02-加载共享缓存"><a href="#0x02-加载共享缓存" class="headerlink" title="0x02 加载共享缓存"></a>0x02 加载共享缓存</h4><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bc780ab0e95?w=934&amp;h=254&amp;f=jpeg&amp;s=75432" alt=""><br><code>checkSharedRegionDisable</code>是检查共享缓存是否禁用,里面可以看到一行注释,iOS 必须开启共享缓存才能运行.<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">static void checkSharedRegionDisable(const dyld3::MachOLoaded* mainExecutableMH, uintptr_t mainExecutableSlide) &#123;</div><div class="line">	// iOS cannot run without shared region</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>接下来调的<code>mapSharedCache()</code>就是加载共享缓存的逻辑,就不深入了.</p>
+<h4 id="0x03-加载主程序"><a href="#0x03-加载主程序" class="headerlink" title="0x03 加载主程序"></a>0x03 加载主程序</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bcce583fe74" alt=""><br>这一步将主程序 Mach-O 加载进内存,并实例化了一个<code>ImageLoader</code>.先看下<code>instantiateFromLoadedImage</code>的调用栈:<br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bd30dade6fb?w=981&amp;h=634&amp;f=png&amp;s=24712" alt=""><br>其中<code>ImageLoader</code>是一个抽象类,它的两个子类<code>ImageLoaderMachOCompressed</code>、<code>ImageLoaderMachOClassic</code>负责把 Mach-O 实例化为 Image.但要用哪个子类来进行实例化是通过<code>sniffLoadCommands</code>来判断Mach-O 文件的 LINKEDIT 是classic或者compressed.<br><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bd8c09017ff?w=1273&amp;h=416&amp;f=jpeg&amp;s=169044" alt=""></p>
+<h4 id="0x04-加载动态库"><a href="#0x04-加载动态库" class="headerlink" title="0x04 加载动态库"></a>0x04 加载动态库</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bea8d46d2b9?w=895&amp;h=139&amp;f=jpeg&amp;s=41335" alt=""><br>遍历<code>DYLD_INSERT_LIBRARIES</code>环境变量,然后调用<code>loadInsertedDylib</code>加载.</p>
+<h4 id="0x05-链接主程序"><a href="#0x05-链接主程序" class="headerlink" title="0x05 链接主程序"></a>0x05 链接主程序</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3be04b01aadb?w=1014&amp;h=183&amp;f=jpeg&amp;s=55502" alt=""><br>调用 link链接主程序,内核调用的是<code>ImageLoader::link</code> 函数,主要是做了加载动态库、rebase、binding 等操作,代码比较多,我就不贴了,在附件的源码上有我写的详细注释.</p>
+<h4 id="0x06-链接动态库"><a href="#0x06-链接动态库" class="headerlink" title="0x06 链接动态库"></a>0x06 链接动态库</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bef72fd35a5?w=993&amp;h=480&amp;f=jpeg&amp;s=158143" alt=""><br>这一步将前面调用 addImage()函数保存在sAllImages 中的动态库列表循环调用 link进行链接,然后调registerInterposing注册符号替换.<br>注意这里的 i+1, 因为sAllImages中第一项是主程序,所以取 i+1项.</p>
+<h4 id="0x07-初始化主程序"><a href="#0x07-初始化主程序" class="headerlink" title="0x07 初始化主程序"></a>0x07 初始化主程序</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bf1e9211961?w=1103&amp;h=331&amp;f=jpeg&amp;s=102988" alt=""><br>这一步由initializeMainExecutable()完成。dyld会优先初始化动态库，然后初始化主程序。该函数首先执行runInitializers()，内部再依次调用processInitializers()、recursiveInitialization(),在recursiveInitialization()函数里找到了 notifySingle();<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">context.notifySingle(dyld_image_state_dependents_initialized, this, &amp;timingInfo);</div></pre></td></tr></table></figure></p>
+<p>再往下找到<code>sNotifyObjCInit</code>,再去找它的赋值找到<code>registerObjCNotifiers</code>,从函数注释来看是用<code>objc runtime</code>来调的,这块之后再看.在查阅一些资料之后得知,这里的<code>sNotifyObjCInit</code>就是调用 objc 中的 load_images,它调用所有的 load 方法,在调用完 load 方法以后调用了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bool hasInitializers = this-&gt;doInitialization(context);</div></pre></td></tr></table></figure></p>
+<p><code>doInitialization</code>又调用了<code>doModInitFunctions</code>, 也就是<code>constuctor</code>方法,关于这个方法可以参看<a href="https://blog.sunnyxx.com/2016/05/14/clang-attributes/" target="_blank" rel="external">链接</a>.</p>
+<h4 id="0x08-返回入口地址"><a href="#0x08-返回入口地址" class="headerlink" title="0x08 返回入口地址"></a>0x08 返回入口地址</h4><p><img src="https://user-gold-cdn.xitu.io/2019/8/27/16cd3bf5fa2f5063?w=986&amp;h=298&amp;f=jpeg&amp;s=108741" alt=""><br>这里调用主程序的<code>getEntryFromLC_MAIN</code>,就是从<code>`Load Command</code>中读取<code>LC_MAIN</code>入口,如果没有,就读取<code>LC_UNIXTHREAD</code>,然后跳到入口处执行,就回到了我们熟悉的<code>main.m</code>.</p>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>1.dyld 源码: <a href="https://opensource.apple.com/tarballs/dyld/" target="_blank" rel="external">https://opensource.apple.com/tarballs/dyld/</a> <br><br>2.本文分析所用版本:  dyld-635.2<br><br>3.带注释 dyld源码地址: <a href="https://github.com/sfmDev/dyld_source_comment" target="_blank" rel="external">Github</a><br></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>1.iOS 应用逆向与安全<br><br>2.<a href="https://www.dllhook.com/post/238.html#toc_14" target="_blank" rel="external">https://www.dllhook.com/post/238.html#toc_14</a><br><br>3.<a href="https://blog.sunnyxx.com/2014/08/30/objc-pre-main/" target="_blank" rel="external">https://blog.sunnyxx.com/2014/08/30/objc-pre-main/</a><br></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/11/MachO-详解到使用/" rel="next" title="MachO 详解到使用">
+                <i class="fa fa-chevron-left"></i> MachO 详解到使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://upload.jianshu.io/users/upload_avatars/1240939/023ebb81b6c7.jpg?imageMogr/thumbnail/390x390/quality/500"
+               alt="石不帅_" />
+          <p class="site-author-name" itemprop="name">石不帅_</p>
+          <p class="site-description motion-element" itemprop="description">iOS开发者 Swift爱好者 处女座</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dyld"><span class="nav-number">2.</span> <span class="nav-text">dyld</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码分析"><span class="nav-number">3.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#0x01-设置运行环境"><span class="nav-number">3.1.</span> <span class="nav-text">0x01 设置运行环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x02-加载共享缓存"><span class="nav-number">3.2.</span> <span class="nav-text">0x02 加载共享缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x03-加载主程序"><span class="nav-number">3.3.</span> <span class="nav-text">0x03 加载主程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x04-加载动态库"><span class="nav-number">3.4.</span> <span class="nav-text">0x04 加载动态库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x05-链接主程序"><span class="nav-number">3.5.</span> <span class="nav-text">0x05 链接主程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x06-链接动态库"><span class="nav-number">3.6.</span> <span class="nav-text">0x06 链接动态库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x07-初始化主程序"><span class="nav-number">3.7.</span> <span class="nav-text">0x07 初始化主程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x08-返回入口地址"><span class="nav-number">3.8.</span> <span class="nav-text">0x08 返回入口地址</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-number">4.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">石不帅_</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
